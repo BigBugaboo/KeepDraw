@@ -28,7 +28,7 @@ export default {
   },
   login: {
     type: 'scene',
-    value: {
+    option: {
       title: '登录',
       key: 'login',
       hideNavBar: true,

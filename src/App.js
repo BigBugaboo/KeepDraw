@@ -27,7 +27,7 @@ const renderComponent = obj => {
       );
     },
     scene: () => {
-      return <Scene {...obj.value} />;
+      return <Scene {...obj.option} />;
     },
   };
 
