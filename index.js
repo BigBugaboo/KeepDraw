@@ -9,7 +9,8 @@ import { YellowBox } from 'react-native';
 
 AppRegistry.registerComponent(appName, () => App);
 
-// 删除
+// 关闭全部黄色警告
+console.disableYellowBox = true;
 YellowBox.ignoreWarnings([
   'Warning: componentWillMount is deprecated',
   'Warning: componentWillReceiveProps is deprecated',

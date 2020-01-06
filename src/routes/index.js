@@ -1,38 +1,24 @@
-import LoadCop from '@/components/hoc/asyncComponent';
+import Home from '@/pages/home/Index';
+import Mine from '@/pages/mine/Index';
+import Login from '@/pages/login/Index';
 
 export default {
-  menu: {
-    type: 'tabs',
-    key: 'tabBar',
-    children: [
-      {
-        title: '首页',
-        key: 'home',
-        hideNavBar: true,
-        component: LoadCop(() => import('@/pages/menu/Home')),
-      },
-      {
-        title: '找爱',
-        key: 'findLove',
-        hideNavBar: true,
-        component: LoadCop(() => import('@/pages/menu/FindLove')),
-      },
-      {
-        initial: true,
-        title: '个人信息',
-        key: 'mine',
-        hideNavBar: true,
-        component: LoadCop(() => import('@/pages/menu/Mine')),
-      },
-    ],
+  home: {
+    title: '主页',
+    key: 'home',
+    hideNavBar: true,
+    component: Home,
+  },
+  mine: {
+    title: '个人信息',
+    key: 'mine',
+    hideNavBar: true,
+    component: Mine,
   },
   login: {
-    type: 'scene',
-    option: {
-      title: '登录',
-      key: 'login',
-      hideNavBar: true,
-      component: LoadCop(() => import('@/pages/login/Login')),
-    },
+    title: '登录',
+    key: 'login',
+    hideNavBar: true,
+    component: Login,
   },
 };
