@@ -1,5 +1,12 @@
 import React, { Component } from 'react';
-import { Text, TouchableOpacity, View, FlatList } from 'react-native';
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  Dimensions,
+  FastList,
+  VirtualizedList,
+} from 'react-native';
 
 class ListItem extends Component {
   onPress = () => {
@@ -22,6 +29,7 @@ export default class List extends Component {
     this.state = {
       selected: new Map(),
     };
+    const { width, height } = Dimensions.get('window');
   }
 
   keyExtractor = (item, index) => item.id;
@@ -43,12 +51,34 @@ export default class List extends Component {
     />
   );
 
+  // 获取item
+  getItem = (data, index) => {
+    return data[index];
+  };
+
+  // 列表长度
+  getItemCount = data => {
+    return data.length;
+  };
+
+  // 固定行高，减少动态测量的开销
+  getItemLayout = (data, index) => {
+    return {
+      length: data.length,
+      offset: this.height,
+      index: index,
+    };
+  };
+
   render() {
     const { style, data } = this.props;
     return (
-      <FlatList
+      <VirtualizedList
         style={style}
         data={data}
+        getItemLayout={this.getItemLayout}
+        getItem={this.getItem}
+        getItemCount={this.getItemCount}
         extraData={this.state}
         keyExtractor={this.keyExtractor}
         renderItem={this.renderItem}
