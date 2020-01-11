@@ -30,7 +30,7 @@ class List extends Component {
     this.state = {
       selected: new Map(),
     };
-    const { width, height } = Dimensions.get('window');
+    this.height = Dimensions.get('window').height;
   }
 
   keyExtractor = (item, index) => item.id;
@@ -76,12 +76,18 @@ class List extends Component {
     return <emptyComponent />;
   };
 
+  // 列表底部
+  ListFooterComponent = () => {
+    return <Text>已经到底了</Text>;
+  };
+
   render() {
     const { style, data } = this.props;
     return (
       <VirtualizedList
         style={style}
         data={data}
+        ListFooterComponent={this.ListFooterComponent}
         getItemLayout={this.getItemLayout}
         getItem={this.getItem}
         getItemCount={this.getItemCount}
