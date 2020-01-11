@@ -1,3 +1,5 @@
+import { Text } from 'react-native';
+
 import Home from '@/pages/home/Index';
 import Mine from '@/pages/mine/Index';
 import Login from '@/pages/login/Index';
@@ -5,17 +7,16 @@ import Login from '@/pages/login/Index';
 export default {
   home: {
     type: 'scene',
-    value: {
+    option: {
+      drawer: true,
       initial: true,
       key: 'tabBar', // 必须存在默认的 tabbar 的 key
-      title: '首页',
-      hideNavBar: true,
       component: Home,
     },
   },
   mine: {
     type: 'scene',
-    value: {
+    option: {
       navBarButtonColor: '#39f',
       title: '个人信息',
       key: 'mine',
@@ -28,7 +29,7 @@ export default {
   },
   login: {
     type: 'scene',
-    value: {
+    option: {
       title: '登录',
       key: 'login',
       hideNavBar: true,

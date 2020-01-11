@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Actions, Router, Scene, Modals, Tabs } from 'react-native-router-flux';
+import { Actions, Router, Scene, Drawer } from 'react-native-router-flux';
 
-import Login from '@/pages/login/Index';
+import Nav from '@/components/common/Nav';
 
 import routes from './routes';
 
@@ -18,8 +18,14 @@ export default class App extends Component {
   render() {
     return (
       <Router backAndroidHandler={this.onBackPress}>
-        <Scene key="root">
-          {Object.keys(routes).map(item => renderComponent(routes[item]))}
+        <Scene key="root" hideNavBar={true}>
+          <Drawer
+            key="sideNav"
+            drawerPosition="right"
+            width={100}
+            contentComponent={Nav}>
+            {Object.keys(routes).map(item => renderComponent(routes[item]))}
+          </Drawer>
         </Scene>
       </Router>
     );
@@ -29,9 +35,7 @@ export default class App extends Component {
 const renderComponent = obj => {
   const actions = {
     scene: () => {
-      return (
-        <Scene navBarButtonColor="#39f" {...obj.value} />
-      );
+      return <Scene navBarButtonColor="#39f" {...obj.option} />;
     },
   };
 
