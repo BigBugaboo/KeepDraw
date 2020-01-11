@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
   Text,
   TouchableOpacity,
@@ -23,7 +24,7 @@ class ListItem extends Component {
   }
 }
 
-export default class List extends Component {
+class List extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -70,6 +71,11 @@ export default class List extends Component {
     };
   };
 
+  // 空数据的时候，显示
+  ListEmptyComponent = () => {
+    return <emptyComponent />;
+  };
+
   render() {
     const { style, data } = this.props;
     return (
@@ -86,3 +92,16 @@ export default class List extends Component {
     );
   }
 }
+
+List.propTypes = {
+  data: PropTypes.array,
+  style: PropTypes.object,
+  // 无数据时显示
+  emptyComponent: PropTypes.element,
+};
+
+List.defaultProps = {
+  emptyComponent: <Text>暂无数据</Text>,
+};
+
+export default List;
