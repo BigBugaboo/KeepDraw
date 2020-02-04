@@ -12,7 +12,6 @@ import { Actions } from 'react-native-router-flux';
 import Button from '@/components/common/Button';
 import List from '@/components/common/List';
 import _ from 'lodash';
-import { hidden } from 'ansi-colors';
 
 export default class Home extends Component {
   render() {
@@ -42,12 +41,6 @@ export default class Home extends Component {
           Content: () => (
             <View style={[box, { height }]}>
               <Text>{item}</Text>
-              <Button type="primary" onPress={() => Actions.push('login')}>
-                login
-              </Button>
-              <Button type="primary" onPress={() => Actions.push('mine')}>
-                mine
-              </Button>
             </View>
           ),
           id: index,

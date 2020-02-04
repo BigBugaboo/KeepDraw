@@ -1,34 +1,32 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import _ from 'lodash';
+import { Actions } from 'react-native-router-flux';
 
-const menuData = [
+const menu = [
   {
-    text: '首页',
-    path: './src/pages/Main.js',
+    key: 'tabBar',
+    title: '首页',
   },
   {
-    text: '爱心',
-    path: './src/pages/FindLove.js',
-  },
-  {
-    text: '我的',
-    path: './src/pages/MIne.js',
+    key: 'mine',
+    title: '我的信息',
   },
 ];
 
 export default () => {
-  const onPress = e => {
-    Alert.alert(e);
+  const onPress = key => {
+    Actions.push(key);
   };
 
   return (
     <View style={styles.container}>
-      {menuData.map((item, index) => (
+      {_.map(menu, (item, index) => (
         <TouchableOpacity
           style={styles.menuItem}
           key={index}
-          onPress={() => onPress(item.path)}>
-          <Text style={styles.itemText}>{item.text}</Text>
+          onPress={() => onPress(item.key)}>
+          <Text style={styles.itemText}>{item.title}</Text>
         </TouchableOpacity>
       ))}
     </View>
@@ -39,15 +37,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'column',
   },
   menuItem: {
-    flex: 1,
-    backgroundColor: 'green',
+    backgroundColor: '#39f',
     display: 'flex',
-    alignItems: 'center',
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#fff',
   },
   itemText: {
     color: '#fff',
+    textAlign: 'center',
   },
 });

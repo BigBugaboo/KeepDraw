@@ -4,8 +4,8 @@ import Home from '@/pages/home/Index';
 import Mine from '@/pages/mine/Index';
 import Login from '@/pages/login/Index';
 
-export default {
-  home: {
+export default [
+  {
     type: 'scene',
     option: {
       drawer: true,
@@ -14,7 +14,7 @@ export default {
       component: Home,
     },
   },
-  mine: {
+  {
     type: 'scene',
     option: {
       navBarButtonColor: '#39f',
@@ -27,7 +27,7 @@ export default {
       },
     },
   },
-  login: {
+  {
     type: 'scene',
     option: {
       title: '登录',
@@ -36,4 +36,4 @@ export default {
       component: Login,
     },
   },
-};
+];

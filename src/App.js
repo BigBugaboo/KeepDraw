@@ -18,15 +18,13 @@ export default class App extends Component {
   render() {
     return (
       <Router backAndroidHandler={this.onBackPress}>
-        <Scene key="root" hideNavBar={true}>
-          <Drawer
-            key="sideNav"
-            drawerPosition="right"
-            width={100}
-            contentComponent={Nav}>
-            {Object.keys(routes).map(item => renderComponent(routes[item]))}
-          </Drawer>
-        </Scene>
+        <Drawer
+          key="sideNav"
+          drawerPosition="right"
+          width={100}
+          contentComponent={Nav}>
+          <Scene key="root">{routes.map(item => renderComponent(item))}</Scene>
+        </Drawer>
       </Router>
     );
   }
