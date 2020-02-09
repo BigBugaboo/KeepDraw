@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import _ from 'lodash';
 import { Actions } from 'react-native-router-flux';
 
@@ -7,16 +7,24 @@ const menu = [
   {
     key: 'tabBar',
     title: '首页',
+    method: 'reset',
   },
   {
     key: 'mine',
     title: '我的信息',
+    method: 'push',
   },
 ];
 
 export default () => {
-  const onPress = key => {
-    Actions.push(key);
+  const onPress = ({ key, method }) => {
+    if (method === 'reset') {
+      Actions.reset(key);
+    } else if (method === 'push') {
+      Actions.push(key);
+    } else {
+      Actions.push(key);
+    }
   };
 
   return (
@@ -25,7 +33,7 @@ export default () => {
         <TouchableOpacity
           style={styles.menuItem}
           key={index}
-          onPress={() => onPress(item.key)}>
+          onPress={() => onPress(item)}>
           <Text style={styles.itemText}>{item.title}</Text>
         </TouchableOpacity>
       ))}
