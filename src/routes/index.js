@@ -1,15 +1,15 @@
 import { Text } from 'react-native';
 
-import Home from '@/pages/home/Index';
-import Mine from '@/pages/mine/Index';
-import Login from '@/pages/login/Index';
+import Home from '@/pages/home/index';
+import Mine from '@/pages/mine/index';
+import Login from '@/pages/login/index';
+import Register from '@/pages/register/index';
 
 export default [
   {
     type: 'scene',
     option: {
       drawer: true,
-      initial: true,
       key: 'tabBar', // 必须存在默认的 tabbar 的 key
       component: Home,
     },
@@ -34,6 +34,16 @@ export default [
       key: 'login',
       hideNavBar: true,
       component: Login,
+    },
+  },
+  {
+    type: 'scene',
+    option: {
+      title: '注册',
+      key: 'register',
+      initial: true,
+      hideNavBar: true,
+      component: Register,
     },
   },
 ];

@@ -4,25 +4,23 @@ import { Actions } from 'react-native-router-flux';
 import _ from 'lodash';
 
 import Button from '@/components/common/Button';
-import Flex from '@/components/common/Flex';
 
-export default class Login extends Component {
+export default class Register extends Component {
   constructor(props) {
     super(props);
     this.state = {
       time: 0,
       phone: '',
-      password: '',
       code: '',
+      password: '',
+      againPassword: '',
     };
   }
 
-  onLogin() {
-    Actions.reset('tabBar');
+  onSubmit() {
+    // 跳转登录
+    Actions.reset('login');
     // Alert.alert('触发登录事件');
-  }
-  onRegister() {
-    Actions.push('register');
   }
 
   onSendCode() {}
@@ -33,8 +31,12 @@ export default class Login extends Component {
     });
   }
 
+  changePassword(str) {
+    return _.replace(str, /./g, '*');
+  }
+
   render() {
-    const { phone, password, code, time } = this.state;
+    const { phone, code, password, againPassword } = this.state;
     const {
       container,
       main,
@@ -45,7 +47,6 @@ export default class Login extends Component {
       rowInput,
       footer,
       normalFont,
-      btnGroup,
     } = styles;
 
     return (
@@ -61,6 +62,22 @@ export default class Login extends Component {
               />
             </View>
             <View style={row}>
+              <Text style={rowText}>密码</Text>
+              <TextInput
+                style={[rowInput, input]}
+                onChangeText={this.onChange.bind(this, 'password')}
+                value={this.changePassword(password)}
+              />
+            </View>
+            <View style={row}>
+              <Text style={rowText}>确认密码</Text>
+              <TextInput
+                style={[rowInput, input]}
+                onChangeText={this.onChange.bind(this, 'againPassword')}
+                value={this.changePassword(againPassword)}
+              />
+            </View>
+            <View style={row}>
               <Text style={rowText}>验证码</Text>
               <View style={rowInput}>
                 <TextInput
@@ -72,23 +89,12 @@ export default class Login extends Component {
               </View>
             </View>
           </View>
-          <Flex justifyCenter>
-            <Button type="link">密码登录</Button>
-            <Button type="link">密码登录</Button>
-          </Flex>
-          <View style={btnGroup}>
-            <Button
-              type="primary"
-              style={{ width: 100, margin: 20 }}
-              onPress={this.onLogin}>
-              登录
-            </Button>
-            <Button
-              style={{ width: 100, margin: 20 }}
-              onPress={this.onRegister}>
-              注册
-            </Button>
-          </View>
+          <Button
+            type="primary"
+            style={{ width: '60%', marginLeft: '20%', margin: 20 }}
+            onPress={this.onSubmit}>
+            登录
+          </Button>
         </View>
         <View style={footer}>
           <Text style={normalFont}>个人开发者：何俊泽</Text>
@@ -109,13 +115,13 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: '#fff',
-    margin: 'auto',
-    width: '90%',
     borderRadius: 10,
+    width: '95%',
     display: 'flex',
   },
   form: {
-    paddingTop: 10,
+    marginBottom: 10,
+    paddingTop: 5,
   },
   row: {
     display: 'flex',
@@ -134,8 +140,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   input: {
-    padding: 0,
     borderBottomWidth: 0.5,
+    padding: 0,
     borderBottomColor: '#999',
   },
   footer: {
@@ -144,10 +150,5 @@ const styles = StyleSheet.create({
   },
   normalFont: {
     color: '#fff',
-  },
-  btnGroup: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
   },
 });

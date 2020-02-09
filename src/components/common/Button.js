@@ -12,12 +12,12 @@ export default class Button extends Component {
     const { onPress, children, type, style } = this.props;
 
     return (
-      <TouchableOpacity onPress={onPress}>
-        <View style={[mineStyles.btn, mineStyles[type], style]}>
-          <Text style={[{ textAlign: 'center' }, mineStyles[type]]}>
-            {children}
-          </Text>
-        </View>
+      <TouchableOpacity
+        style={[mineStyles.btn, mineStyles[type], style]}
+        onPress={onPress}>
+        <Text style={[{ textAlign: 'center' }, mineStyles[type]]}>
+          {children}
+        </Text>
       </TouchableOpacity>
     );
   }
@@ -26,7 +26,12 @@ export default class Button extends Component {
 const mineStyles = StyleSheet.create({
   btn: {
     backgroundColor: '#ddd',
-    padding: 10,
+    padding: 5,
+    borderRadius: 10,
+  },
+  link: {
+    // backgroundColor: 'transparent',
+    padding: 5,
     borderRadius: 10,
   },
   primary: {
@@ -47,7 +52,7 @@ const mineStyles = StyleSheet.create({
 });
 
 Button.propsTypes = {
-  styles: PropTypes.object,
+  style: PropTypes.object,
   type: PropTypes.oneOf(['primary', 'warn', 'danger', 'success']),
   children: PropTypes.element.isRequired,
   onPress: PropTypes.func,
