@@ -1,15 +1,28 @@
-import { extend } from 'umi-request';
+import { ToastAndroid } from 'react-native';
 
-export const Request = extend({
-  timeout: 1000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  params: {
-    token: 'xxx', // 所有请求默认带上 token 参数
-  },
-  errorHandler: function(error) {
-    /* 异常处理 */
-    console.log('异常', error);
-  },
-});
+const base_url = 'http://192.168.3.3:3000/graphql';
+
+export const Request = (type = 'query', req, callback) => {
+  return fetch(base_url, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      query: `
+          ${type}{
+            ${req}
+          }
+        `,
+    }),
+  })
+    .then(response => response.text())
+    .then(callback)
+    .catch(error => {
+      // 错误捕捉
+      ToastAndroid.show('网络错误', ToastAndroid.SHORT);
+      console.warn('网络错误', error);
+    })
+    .done();
+};

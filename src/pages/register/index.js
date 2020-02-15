@@ -19,33 +19,18 @@ export default class Register extends Component {
   }
 
   componentDidMount() {
-    fetch('http://192.168.3.3:3000/graphql', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
+    Request(
+      'mutation',
+      `
+      postRegister(phone: "asdas", password: "123123") {
+        mes
+        phone
+      }
+    `,
+      responseText => {
+        console.warn('测试', responseText);
       },
-      body: JSON.stringify({
-        query: `
-          mutation{
-            postRegister(phone: "asdas", password: "123123") {
-              mes
-              phone
-            }
-          }
-        `,
-      }),
-    })
-      .then(response => response.text())
-      .then(responseText => {
-        console.warn(responseText);
-        ToastAndroid.show(responseText, ToastAndroid.SHORT);
-      })
-      .catch(error => {
-        ToastAndroid.show(error, ToastAndroid.SHORT);
-        console.warn(error);
-      })
-      .done();
+    );
   }
 
   onSubmit() {
