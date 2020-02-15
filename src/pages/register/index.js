@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { Text, View, ToastAndroid, StyleSheet, TextInput } from 'react-native';
+import { Text, View, StyleSheet, TextInput } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import _ from 'lodash';
 
 import { Request } from '@/api/index';
 import Button from '@/components/common/Button';
+import Loading from '@/components/common/Loading';
 
 export default class Register extends Component {
   constructor(props) {
@@ -18,7 +19,7 @@ export default class Register extends Component {
     };
   }
 
-  componentDidMount() {
+  onSubmit() {
     Request(
       'mutation',
       `
@@ -27,15 +28,11 @@ export default class Register extends Component {
         phone
       }
     `,
-      responseText => {
-        console.warn('测试', responseText);
-      },
-    );
-  }
-
-  onSubmit() {
+    ).then(json => {
+      console.log('测试', json);
+    });
     // 跳转登录
-    Actions.reset('login');
+    // Actions.reset('login');
     // Alert.alert('触发登录事件');
   }
 
@@ -67,6 +64,7 @@ export default class Register extends Component {
 
     return (
       <View style={main}>
+        <Loading show={true} />
         <View style={container}>
           <View style={form}>
             <View style={row}>
@@ -109,7 +107,7 @@ export default class Register extends Component {
             type="primary"
             style={{ width: '60%', marginLeft: '20%', margin: 20 }}
             onPress={this.onSubmit}>
-            登录
+            注册
           </Button>
         </View>
         <View style={footer}>
