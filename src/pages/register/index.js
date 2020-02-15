@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Text, View, Alert, StyleSheet, TextInput } from 'react-native';
+import { Text, View, ToastAndroid, StyleSheet, TextInput } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import _ from 'lodash';
 
+import { Request } from '@/api/index';
 import Button from '@/components/common/Button';
 
 export default class Register extends Component {
@@ -15,6 +16,36 @@ export default class Register extends Component {
       password: '',
       againPassword: '',
     };
+  }
+
+  componentDidMount() {
+    fetch('http://192.168.3.3:3000/graphql', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: `
+          mutation{
+            postRegister(phone: "asdas", password: "123123") {
+              mes
+              phone
+            }
+          }
+        `,
+      }),
+    })
+      .then(response => response.text())
+      .then(responseText => {
+        console.warn(responseText);
+        ToastAndroid.show(responseText, ToastAndroid.SHORT);
+      })
+      .catch(error => {
+        ToastAndroid.show(error, ToastAndroid.SHORT);
+        console.warn(error);
+      })
+      .done();
   }
 
   onSubmit() {
