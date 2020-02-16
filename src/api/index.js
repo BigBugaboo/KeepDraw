@@ -22,5 +22,5 @@ export const Request = (type = 'query', req) => {
       // 错误捕捉
       ToastAndroid.show('网络错误', ToastAndroid.SHORT);
       console.warn('网络错误', error);
-    })
+    });
 };

@@ -1,5 +1,3 @@
-import { Text } from 'react-native';
-
 import Home from '@/pages/home/index';
 import Mine from '@/pages/mine/index';
 import Login from '@/pages/login/index';

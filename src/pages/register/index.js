@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, StyleSheet, TextInput } from 'react-native';
+import { Text, View, StyleSheet, TextInput, ToastAndroid } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import _ from 'lodash';
 
@@ -12,44 +12,132 @@ export default class Register extends Component {
     super(props);
     this.state = {
       time: 0,
-      phone: '',
+      inputList: [
+        {
+          text: '手机',
+          name: 'phone',
+          maxLength: 11,
+          placeholder: '请输入11位有效手机号码',
+          msg: '',
+          value: '',
+        },
+        {
+          text: '密码',
+          name: 'password',
+          maxLength: 20,
+          placeholder: '6-20位，由字母、数值或下划线组成',
+          msg: '',
+          value: '',
+        },
+        {
+          text: '确认密码',
+          name: 'againPassword',
+          maxLength: 20,
+          placeholder: '请再次输入密码',
+          msg: '',
+          value: '',
+        },
+      ],
       code: '',
-      password: '',
-      againPassword: '',
+      isLoad: false,
     };
+    this.onSubmit = this.onSubmit.bind(this);
+    this.onCheck = this.onCheck.bind(this);
   }
 
   onSubmit() {
-    Request(
-      'mutation',
-      `
-      postRegister(phone: "asdas", password: "123123") {
-        mes
-        phone
-      }
-    `,
-    ).then(json => {
-      console.log('测试', json);
-    });
-    // 跳转登录
-    // Actions.reset('login');
-    // Alert.alert('触发登录事件');
+    // 再校验一次
+    const isSubmit = _.reduce(
+      this.state.inputList,
+      (res, item, index) => {
+        const msg = this.onCheck(item, index);
+        if (res) {
+          return msg === '';
+        }
+        return res;
+      },
+      true,
+    );
+    if (isSubmit) {
+      Request(
+        'mutation',
+        `
+        postRegister(phone: "asdas", password: "123123") {
+          mes
+          phone
+        }
+      `,
+      ).then(json => {
+        console.log('测试', json);
+        // 跳转登录
+        Actions.reset('login');
+      });
+    } else {
+      ToastAndroid.showWithGravity(
+        '请输入注册信息',
+        ToastAndroid.SHORT,
+        ToastAndroid.Center,
+      );
+    }
   }
 
   onSendCode() {}
 
-  onChange(name, value) {
+  onChange(item, index, value) {
+    let newList = _.cloneDeep(this.state.inputList);
+    newList[index] = {
+      ...item,
+      value: value,
+    };
     this.setState({
-      [name]: value,
+      inputList: newList,
     });
   }
 
+  // 校验
+  onCheck(item, index, e) {
+    let msg = '';
+    const actions = {
+      phone: () => {
+        msg = item.value.length === 11 ? '' : '手机号长度不足11位，请重新输入';
+      },
+      password: () => {
+        // 6-20 字母数字下划线组成
+        const patrn = /^(\w){6,20}$/;
+        msg = patrn.exec(item.value) ? '' : '密码格式错误,请重新输入';
+      },
+      againPassword: () => {
+        const passwordValue = _.filter(
+          this.state.inputList,
+          item => item.name === 'password',
+        )[0].value;
+        msg = item.value === passwordValue ? '' : '两次密码不一致';
+      },
+    };
+
+    if (typeof actions[item.name] === 'function') {
+      actions[item.name]();
+    }
+
+    let newList = _.cloneDeep(this.state.inputList);
+    newList[index] = {
+      ...item,
+      msg: msg,
+    };
+    this.setState({
+      inputList: newList,
+    });
+
+    return msg;
+  }
+
+  // 密码掩盖
   changePassword(str) {
     return _.replace(str, /./g, '*');
   }
 
   render() {
-    const { phone, code, password, againPassword } = this.state;
+    const { code, isLoad, inputList } = this.state;
     const {
       container,
       main,
@@ -58,39 +146,32 @@ export default class Register extends Component {
       input,
       rowText,
       rowInput,
-      footer,
-      normalFont,
+      inputTip,
     } = styles;
 
     return (
       <View style={main}>
-        <Loading show={true} />
+        <Loading show={isLoad} />
         <View style={container}>
           <View style={form}>
-            <View style={row}>
-              <Text style={rowText}>手机</Text>
-              <TextInput
-                style={[rowInput, input]}
-                onChangeText={this.onChange.bind(this, 'phone')}
-                value={phone}
-              />
-            </View>
-            <View style={row}>
-              <Text style={rowText}>密码</Text>
-              <TextInput
-                style={[rowInput, input]}
-                onChangeText={this.onChange.bind(this, 'password')}
-                value={this.changePassword(password)}
-              />
-            </View>
-            <View style={row}>
-              <Text style={rowText}>确认密码</Text>
-              <TextInput
-                style={[rowInput, input]}
-                onChangeText={this.onChange.bind(this, 'againPassword')}
-                value={this.changePassword(againPassword)}
-              />
-            </View>
+            {inputList.map((item, index) => (
+              <View>
+                <View style={row} key={index}>
+                  <Text style={rowText}>{item.text}</Text>
+                  <TextInput
+                    style={[rowInput, input]}
+                    onChangeText={this.onChange.bind(this, item, index)}
+                    value={item.value}
+                    placeholder={item.placeholder}
+                    maxLength={item.maxLength}
+                    onBlur={this.onCheck.bind(this, item, index)}
+                  />
+                </View>
+                {item.msg ? (
+                  <Text style={[inputTip, { color: '#f33' }]}>{item.msg}</Text>
+                ) : null}
+              </View>
+            ))}
             <View style={row}>
               <Text style={rowText}>验证码</Text>
               <View style={rowInput}>
@@ -109,9 +190,6 @@ export default class Register extends Component {
             onPress={this.onSubmit}>
             注册
           </Button>
-        </View>
-        <View style={footer}>
-          <Text style={normalFont}>个人开发者：何俊泽</Text>
         </View>
       </View>
     );
@@ -158,11 +236,9 @@ const styles = StyleSheet.create({
     padding: 0,
     borderBottomColor: '#999',
   },
-  footer: {
-    position: 'absolute',
-    bottom: 0,
-  },
-  normalFont: {
-    color: '#fff',
+  inputTip: {
+    fontSize: 10,
+    textAlign: 'right',
+    marginRight: 10,
   },
 });
