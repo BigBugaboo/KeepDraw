@@ -30,9 +30,9 @@ const mineStyles = StyleSheet.create({
     borderRadius: 10,
   },
   link: {
-    // backgroundColor: 'transparent',
-    padding: 5,
-    borderRadius: 10,
+    backgroundColor: 'transparent',
+    padding: 0,
+    color: '#39f',
   },
   primary: {
     backgroundColor: '#39f',

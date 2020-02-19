@@ -22,7 +22,11 @@ export default class Button extends Component {
       [],
     );
 
-    return <View style={[mineStyles.flex, ...styles]}>{children}</View>;
+    return (
+      <View style={[mineStyles.flex, ...styles, this.props.style]}>
+        {children}
+      </View>
+    );
   }
 }
 

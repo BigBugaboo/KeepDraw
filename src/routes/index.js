@@ -30,6 +30,7 @@ export default [
     option: {
       title: '登录',
       key: 'login',
+      initial: true,
       hideNavBar: true,
       component: Login,
     },
@@ -39,7 +40,6 @@ export default [
     option: {
       title: '注册',
       key: 'register',
-      initial: true,
       hideNavBar: true,
       component: Register,
     },
