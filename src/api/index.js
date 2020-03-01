@@ -18,9 +18,14 @@ export const Request = (type = 'query', req) => {
     }),
   })
     .then(response => response.text())
+    .then(res => Promise.resolve(JSON.parse(res)))
     .catch(error => {
       // 错误捕捉
-      ToastAndroid.show('网络错误', ToastAndroid.SHORT);
+      ToastAndroid.showWithGravity(
+        '网络错误',
+        ToastAndroid.SHORT,
+        ToastAndroid.TOP,
+      );
       console.warn('网络错误', error);
     });
 };

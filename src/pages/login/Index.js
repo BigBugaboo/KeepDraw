@@ -4,6 +4,7 @@ import {
   View,
   TouchableOpacity,
   StyleSheet,
+  ToastAndroid,
   TextInput,
 } from 'react-native';
 import { Actions } from 'react-native-router-flux';
@@ -11,6 +12,7 @@ import _ from 'lodash';
 
 import Button from '@/components/common/Button';
 import Flex from '@/components/common/Flex';
+import { Request } from '@/api/index';
 
 export default class Login extends Component {
   constructor(props) {
@@ -25,15 +27,50 @@ export default class Login extends Component {
     };
   }
 
-  onLogin() {
-    Actions.reset('tabBar');
-    // Alert.alert('触发登录事件');
-  }
-  onRegister() {
-    Actions.push('register');
-  }
+  onLogin = () => {
+    const { phone, password } = this.state;
+    // 校验
+    if (phone.length !== 11) {
+      ToastAndroid.showWithGravity(
+        '请填写有效的11手机号码!',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+      return null;
+    } else if (password.trim() === '') {
+      ToastAndroid.showWithGravity(
+        '密码为空，请输入密码',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+      return null;
+    }
 
-  onSendCode() {
+    Request(
+      'mutation',
+      `
+      postLogin(phone: "${phone}", password: "${password}") {
+        mes
+        token
+      }
+    `,
+    ).then(json => {
+      console.log('登录', json);
+      // 跳转登录
+      // Actions.reset('tabBar');
+    });
+    // Alert.alert('触发登录事件');
+  };
+  onRegister = () => {
+    Actions.push('register');
+  };
+
+  onSendCode = () => {
+    if (this.state.time === 60) {
+      this.setState({
+        time: 59,
+      });
+    }
     const timer = setInterval(() => {
       this.setState(
         preState => ({
@@ -53,13 +90,13 @@ export default class Login extends Component {
     this.setState({
       timer,
     });
-  }
+  };
 
-  onChange(name, value) {
+  onChange = (name, value) => {
     this.setState({
       [name]: value,
     });
-  }
+  };
 
   render() {
     const { phone, password, code, time, type } = this.state;
@@ -77,7 +114,7 @@ export default class Login extends Component {
       navBtnGroup,
       navBtnGroupItem,
     } = styles;
-    console.log(this.state.time);
+
     return (
       <View style={main}>
         <View style={container}>
@@ -97,6 +134,7 @@ export default class Login extends Component {
             <View style={row}>
               <Text style={rowText}>手机</Text>
               <TextInput
+                keyboardType="numeric"
                 style={[rowInput, input]}
                 onChangeText={this.onChange.bind(this, 'phone')}
                 value={phone}
@@ -107,6 +145,7 @@ export default class Login extends Component {
               <View style={row}>
                 <Text style={rowText}>密码</Text>
                 <TextInput
+                  secureTextEntry={true}
                   style={[rowInput, input]}
                   onChangeText={this.onChange.bind(this, 'password')}
                   value={password}
@@ -118,14 +157,13 @@ export default class Login extends Component {
                 <Text style={rowText}>验证码</Text>
                 <View style={rowInput}>
                   <TextInput
+                    keyboardType="numeric"
                     style={[input, { flex: 3 }]}
                     onChangeText={this.onChange.bind(this, 'code')}
                     value={code}
                   />
                   {time === 60 ? (
-                    <Button onPress={this.onSendCode.bind(this)}>
-                      发送验证码
-                    </Button>
+                    <Button onPress={this.onSendCode}>发送验证码</Button>
                   ) : (
                     <Text>{`${time}秒后可重发`}</Text>
                   )}
@@ -149,7 +187,7 @@ export default class Login extends Component {
           </View>
         </View>
         <View style={footer}>
-          <Text style={normalFont}>个人开发者：何俊泽</Text>
+          <Text style={normalFont}>开发：何俊泽</Text>
         </View>
       </View>
     );

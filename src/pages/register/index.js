@@ -20,6 +20,9 @@ export default class Register extends Component {
           placeholder: '请输入11位有效手机号码',
           msg: '',
           value: '',
+          inputOption: {
+            keyboardType: 'numeric',
+          },
         },
         {
           text: '密码',
@@ -28,6 +31,9 @@ export default class Register extends Component {
           placeholder: '6-20位，由字母、数值或下划线组成',
           msg: '',
           value: '',
+          inputOption: {
+            secureTextEntry: true,
+          },
         },
         {
           text: '确认密码',
@@ -36,18 +42,19 @@ export default class Register extends Component {
           placeholder: '请再次输入密码',
           msg: '',
           value: '',
+          inputOption: {
+            secureTextEntry: true,
+          },
         },
       ],
       code: '',
       isLoad: false,
     };
-    this.onSubmit = this.onSubmit.bind(this);
-    this.onCheck = this.onCheck.bind(this);
   }
 
-  onSubmit() {
+  onSubmit = () => {
     // 再校验一次
-    const isSubmit = _.reduce(
+    let isSubmit = _.reduce(
       this.state.inputList,
       (res, item, index) => {
         const msg = this.onCheck(item, index);
@@ -58,32 +65,89 @@ export default class Register extends Component {
       },
       true,
     );
+
+    // 判断是否输入验证码
+    if (this.state.code === '') {
+      ToastAndroid.show('请输入验证码', ToastAndroid.SHORT);
+      return;
+    }
+
     if (isSubmit) {
+      let req = {};
+      _.forEach(this.state.inputList, item => {
+        req[item.name] = item.value;
+      });
       Request(
         'mutation',
         `
-        postRegister(phone: "asdas", password: "123123") {
+        postRegister(
+          phone: "${req.phone}", 
+          password: "${req.password}", 
+          code: "${this.state.code}"
+          ) {
           mes
           phone
         }
       `,
       ).then(json => {
-        console.log('测试', json);
-        // 跳转登录
-        Actions.reset('login');
+        const { mes, phone } = json.data.postRegister;
+        ToastAndroid.showWithGravity(
+          mes,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        if (phone === req.phone) {
+          // 跳转登录，携带手机号自动填写
+          Actions.reset('login');
+        }
       });
     } else {
       ToastAndroid.showWithGravity(
         '请输入注册信息',
         ToastAndroid.SHORT,
-        ToastAndroid.Center,
+        ToastAndroid.CENTER,
       );
     }
-  }
+  };
 
-  onSendCode() {}
+  onSendCode = () => {
+    let req = {};
+    _.forEach(this.state.inputList, item => {
+      req[item.name] = item.value;
+    });
+    if (req.phone === '' || req.phone.length < 11) {
+      ToastAndroid.showWithGravity(
+        '请输入完整手机号码',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+      return;
+    }
+    Request(
+      'mutation',
+      `
+      sendSmsCode(phone: "${req.phone}") {mes}
+    `,
+    ).then(json => {
+      let mes = '';
+      const {
+        data: { sendSmsCode },
+        errors,
+      } = json;
+      if (errors) {
+        mes = '手机错误，请输入有效的手机号码';
+      } else {
+        mes = sendSmsCode.mes;
+      }
+      ToastAndroid.showWithGravity(
+        mes,
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+    });
+  };
 
-  onChange(item, index, value) {
+  onChange = (item, index, value) => {
     let newList = _.cloneDeep(this.state.inputList);
     newList[index] = {
       ...item,
@@ -92,10 +156,10 @@ export default class Register extends Component {
     this.setState({
       inputList: newList,
     });
-  }
+  };
 
   // 校验
-  onCheck(item, index, e) {
+  onCheck = (item, index, e) => {
     let msg = '';
     const actions = {
       phone: () => {
@@ -129,12 +193,12 @@ export default class Register extends Component {
     });
 
     return msg;
-  }
+  };
 
   // 密码掩盖
-  changePassword(str) {
+  changePassword = str => {
     return _.replace(str, /./g, '*');
-  }
+  };
 
   render() {
     const { code, isLoad, inputList } = this.state;
@@ -165,6 +229,7 @@ export default class Register extends Component {
                     placeholder={item.placeholder}
                     maxLength={item.maxLength}
                     onBlur={this.onCheck.bind(this, item, index)}
+                    {...item.inputOption}
                   />
                 </View>
                 {item.msg ? (
@@ -176,11 +241,12 @@ export default class Register extends Component {
               <Text style={rowText}>验证码</Text>
               <View style={rowInput}>
                 <TextInput
+                  keyboardType="numeric"
                   style={[input, { flex: 3 }]}
-                  onChangeText={this.onChange.bind(this, 'code')}
+                  onChangeText={v => this.setState({ code: v })}
                   value={code}
                 />
-                <Button>发送验证码</Button>
+                <Button onPress={this.onSendCode}>发送验证码</Button>
               </View>
             </View>
           </View>
