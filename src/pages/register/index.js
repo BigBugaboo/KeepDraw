@@ -3,15 +3,16 @@ import { Text, View, StyleSheet, TextInput, ToastAndroid } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import _ from 'lodash';
 
-import { Request } from '@/api/index';
-import Button from '@/components/common/Button';
-import Loading from '@/components/common/Loading';
+import { Request } from '../../api/index';
+import Button from '../../components/common/Button';
+import Loading from '../../components/common/Loading';
+
+import { throttle } from '../../utils';
 
 export default class Register extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      time: 0,
       inputList: [
         {
           text: '手机',
@@ -49,58 +50,80 @@ export default class Register extends Component {
       ],
       code: '',
       isLoad: false,
+      time: 60,
+      timmer: null,
     };
   }
 
   onSubmit = () => {
+    const isSubmit = true;
     // 再校验一次
-    let isSubmit = _.reduce(
-      this.state.inputList,
-      (res, item, index) => {
-        const msg = this.onCheck(item, index);
-        if (res) {
-          return msg === '';
-        }
-        return res;
-      },
-      true,
-    );
+    // let isSubmit = _.reduce(
+    //   this.state.inputList,
+    //   (res, item, index) => {
+    //     const msg = this.onCheck(item, index);
+    //     if (res) {
+    //       return msg === '';
+    //     }
+    //     return res;
+    //   },
+    //   true,
+    // );
 
-    // 判断是否输入验证码
-    if (this.state.code === '') {
-      ToastAndroid.show('请输入验证码', ToastAndroid.SHORT);
-      return;
-    }
+    // // 判断是否输入验证码
+    // if (this.state.code === '') {
+    //   ToastAndroid.showWithGravity(
+    //     '请输入验证码',
+    //     ToastAndroid.SHORT,
+    //     ToastAndroid.CENTER,
+    //   );
+    //   return;
+    // }
 
     if (isSubmit) {
-      let req = {};
-      _.forEach(this.state.inputList, item => {
-        req[item.name] = item.value;
-      });
-      Request(
-        'mutation',
-        `
-        postRegister(
-          phone: "${req.phone}", 
-          password: "${req.password}", 
-          code: "${this.state.code}"
-          ) {
-          mes
-          phone
-        }
-      `,
-      ).then(json => {
-        const { mes, phone } = json.data.postRegister;
-        ToastAndroid.showWithGravity(
-          mes,
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
-        if (phone === req.phone) {
-          // 跳转登录，携带手机号自动填写
-          Actions.reset('login');
-        }
-      });
+      console.log(this.state.isLoad);
+      this.setState(
+        {
+          isLoad: true,
+        },
+        () => {
+          let req = {};
+          _.forEach(this.state.inputList, item => {
+            req[item.name] = item.value;
+          });
+          Request(
+            'mutation',
+            `
+            postRegister(
+              phone: "${req.phone}", 
+              password: "${req.password}", 
+              code: "${this.state.code}"
+              ) {
+              mes
+              phone
+            }
+          `,
+          )
+            .then(json => {
+              const { mes, phone } = json.data.postRegister;
+              ToastAndroid.showWithGravity(
+                mes,
+                ToastAndroid.SHORT,
+                ToastAndroid.CENTER,
+              );
+              if (phone === req.phone) {
+                // todo 跳转登录，携带手机号自动填写
+                Actions.reset('login');
+              }
+            })
+            .finally(() => {
+              console.log(this.state.isLoad);
+              this.setState({
+                isLoad: false,
+              });
+            });
+        },
+      );
     } else {
       ToastAndroid.showWithGravity(
         '请输入注册信息',
@@ -112,6 +135,7 @@ export default class Register extends Component {
 
   onSendCode = () => {
     let req = {};
+
     _.forEach(this.state.inputList, item => {
       req[item.name] = item.value;
     });
@@ -123,27 +147,56 @@ export default class Register extends Component {
       );
       return;
     }
-    Request(
-      'mutation',
-      `
-      sendSmsCode(phone: "${req.phone}") {mes}
-    `,
-    ).then(json => {
-      let mes = '';
-      const {
-        data: { sendSmsCode },
-        errors,
-      } = json;
-      if (errors) {
-        mes = '手机错误，请输入有效的手机号码';
-      } else {
-        mes = sendSmsCode.mes;
-      }
-      ToastAndroid.showWithGravity(
-        mes,
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER,
+
+    this.onTimer();
+    this.setState({
+      isLoad: true,
+    });
+
+    Request('mutation', `sendSmsCode(phone: "${req.phone}") {mes}`)
+      .then(json => {
+        let mes = '';
+        const {
+          data: { sendSmsCode },
+          errors,
+        } = json;
+        if (errors) {
+          mes = '手机错误，请输入有效的手机号码';
+        } else {
+          mes = sendSmsCode.mes;
+        }
+        ToastAndroid.showWithGravity(
+          mes,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+      })
+      .finally(() => {
+        this.setState({
+          isLoad: false,
+        });
+      });
+  };
+
+  onTimer = () => {
+    const timer = setInterval(() => {
+      this.setState(
+        preState => ({
+          time: preState.time - 1,
+        }),
+        () => {
+          if (this.state.time === 0) {
+            clearInterval(this.state.timer);
+            this.setState({
+              time: 60,
+            });
+          }
+        },
       );
+    }, 1000);
+
+    this.setState({
+      timer,
     });
   };
 
@@ -195,13 +248,8 @@ export default class Register extends Component {
     return msg;
   };
 
-  // 密码掩盖
-  changePassword = str => {
-    return _.replace(str, /./g, '*');
-  };
-
   render() {
-    const { code, isLoad, inputList } = this.state;
+    const { code, isLoad, inputList, time } = this.state;
     const {
       container,
       main,
@@ -246,14 +294,20 @@ export default class Register extends Component {
                   onChangeText={v => this.setState({ code: v })}
                   value={code}
                 />
-                <Button onPress={this.onSendCode}>发送验证码</Button>
+                {time === 60 ? (
+                  <Button onPress={throttle(this.onSendCode)}>
+                    发送验证码
+                  </Button>
+                ) : (
+                  <Text>{`${time}秒后可重发`}</Text>
+                )}
               </View>
             </View>
           </View>
           <Button
             type="primary"
             style={{ width: '60%', marginLeft: '20%', margin: 20 }}
-            onPress={this.onSubmit}>
+            onPress={throttle(this.onSubmit)}>
             注册
           </Button>
         </View>

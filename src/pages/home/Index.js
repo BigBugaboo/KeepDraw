@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 
-import Button from '@/components/common/Button';
-import List from '@/components/common/List';
+import Button from '../../components/common/Button';
+import List from '../../components/common/List';
 import _ from 'lodash';
 
 export default class Home extends Component {

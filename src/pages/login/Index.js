@@ -10,9 +10,10 @@ import {
 import { Actions } from 'react-native-router-flux';
 import _ from 'lodash';
 
-import Button from '@/components/common/Button';
-import Flex from '@/components/common/Flex';
-import { Request } from '@/api/index';
+import Button from '../../components/common/Button';
+import Flex from '../../components/common/Flex';
+import Loading from '../../components/common/Loading';
+import { Request } from '../../api/index';
 
 export default class Login extends Component {
   constructor(props) {
@@ -24,11 +25,12 @@ export default class Login extends Component {
       password: '',
       code: '',
       timer: null,
+      isLoad: false,
     };
   }
 
   onLogin = () => {
-    const { phone, password } = this.state;
+    const { phone, password, type, code } = this.state;
     // 校验
     if (phone.length !== 11) {
       ToastAndroid.showWithGravity(
@@ -37,19 +39,37 @@ export default class Login extends Component {
         ToastAndroid.CENTER,
       );
       return null;
-    } else if (password.trim() === '') {
+    } else if (type === 0 && password.trim() === '') {
       ToastAndroid.showWithGravity(
         '密码为空，请输入密码',
         ToastAndroid.SHORT,
         ToastAndroid.CENTER,
       );
       return null;
+    } else if (type === 1 && code.trim() === '') {
+      ToastAndroid.showWithGravity(
+        '验证码为空，请输入密码',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+      return null;
     }
 
+    const types = [
+      {
+        method: 'postLogin',
+        argument: `(phone: "${phone}", password: "${password}")`,
+      },
+      {
+        method: 'postSmsLogin',
+        argument: `(phone: "${phone}", code: "${code}")`,
+      },
+    ];
+    console.log(phone);
     Request(
       'mutation',
       `
-      postLogin(phone: "${phone}", password: "${password}") {
+      ${types[type].method}${types[type].argument} {
         mes
         token
       }
@@ -66,11 +86,47 @@ export default class Login extends Component {
   };
 
   onSendCode = () => {
-    if (this.state.time === 60) {
-      this.setState({
-        time: 59,
-      });
+    const { phone } = this.state;
+    if (phone.trim().length !== 11) {
+      ToastAndroid.showWithGravity(
+        '手机格式不正确',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+      return null;
     }
+
+    this.onTimer();
+    this.setState({
+      isLoad: true,
+    });
+
+    Request('mutation', `sendSmsCode(phone: "${phone}") {mes}`)
+      .then(json => {
+        let mes = '';
+        const {
+          data: { sendSmsCode },
+          errors,
+        } = json;
+        if (errors) {
+          mes = '手机错误，请输入有效的手机号码';
+        } else {
+          mes = sendSmsCode.mes;
+        }
+        ToastAndroid.showWithGravity(
+          mes,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+      })
+      .finally(() => {
+        this.setState({
+          isLoad: false,
+        });
+      });
+  };
+
+  onTimer = () => {
     const timer = setInterval(() => {
       this.setState(
         preState => ({
@@ -99,7 +155,7 @@ export default class Login extends Component {
   };
 
   render() {
-    const { phone, password, code, time, type } = this.state;
+    const { phone, password, code, time, type, isLoad } = this.state;
     const {
       container,
       main,
@@ -117,6 +173,7 @@ export default class Login extends Component {
 
     return (
       <View style={main}>
+        <Loading show={isLoad} />
         <View style={container}>
           <Flex style={navBtnGroup} justifyCenter>
             <TouchableOpacity

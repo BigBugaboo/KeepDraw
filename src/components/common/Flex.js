@@ -35,6 +35,12 @@ const mineStyles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
   },
+  row: {
+    flexDirection: 'row',
+  },
+  column: {
+    flexDirection: 'column',
+  },
   justifyAround: {
     justifyContent: 'space-around',
   },
@@ -50,10 +56,19 @@ const mineStyles = StyleSheet.create({
   justifyEnd: {
     justifyContent: 'flex-end',
   },
+  alignCenter: {
+    alignItems: 'center',
+  },
 });
 
 Button.propsTypes = {
   children: PropTypes.element.isRequired,
+  row: PropTypes.bool,
+  column: PropTypes.bool,
   justifyAround: PropTypes.bool,
   justifyCenter: PropTypes.bool,
-};
+  justifyEvenly: PropTypes.bool,
+  justifyStart: PropTypes.bool,
+  justifyEnd: PropTypes.bool,
+  alignCenter: PropTypes.bool,
+}
