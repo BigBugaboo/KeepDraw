@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 // 按钮组件
 export default class Button extends Component {
@@ -9,13 +9,13 @@ export default class Button extends Component {
   }
 
   render() {
-    const { onPress, children, type, style } = this.props;
+    const { onPress, children, type, style, textStyle } = this.props;
 
     return (
       <TouchableOpacity
         style={[mineStyles.btn, mineStyles[type], style]}
         onPress={onPress}>
-        <Text style={[{ textAlign: 'center' }, mineStyles[type]]}>
+        <Text style={[{ textAlign: 'center' }, mineStyles[type], textStyle]}>
           {children}
         </Text>
       </TouchableOpacity>
@@ -53,7 +53,8 @@ const mineStyles = StyleSheet.create({
 
 Button.propsTypes = {
   style: PropTypes.object,
-  type: PropTypes.oneOf(['primary', 'warn', 'danger', 'success']),
+  textStyle: PropTypes.object,
+  type: PropTypes.oneOf(['primary', 'warn', 'danger', 'success', 'link']),
   children: PropTypes.element.isRequired,
   onPress: PropTypes.func,
 };

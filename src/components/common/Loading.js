@@ -13,7 +13,7 @@ export default class Loading extends Component {
       <View style={[styles.container]}>
         <Flex style={styles.box} column justifyAround alignCenter>
           <ActivityIndicator size={size} color={color} />
-          <Text>{text}</Text>
+          <Text style={{ color: '#39f'}}>{text}</Text>
         </Flex>
       </View>
     ) : null;
@@ -28,7 +28,7 @@ Loading.propTypes = {
 };
 
 Loading.defaultProps = {
-  color: '#0000ff',
+  color: '#fff',
   size: 'large',
   show: false,
   text: '加载中',

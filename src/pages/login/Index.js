@@ -21,12 +21,39 @@ export default class Login extends Component {
     this.state = {
       type: 0, // 0: 密码登录,1: 验证码登录
       time: 60,
-      phone: '',
+      phone: props.phone || '',
       password: '',
       code: '',
       timer: null,
       isLoad: false,
     };
+  }
+
+  componentDidMount() {
+    global.storage
+      .load({
+        key: 'userLoginInfo',
+      })
+      .then(ret => {
+        // 如果找到数据，则在then方法中返回
+        if (ret.token) {
+          // 跳转首页
+          Actions.reset('tabBar');
+        }
+      })
+      .catch(err => {
+        // 如果没有找到数据且没有sync方法，
+        // 或者有其他异常，则在catch中返回
+        console.warn(err.message);
+        switch (err.name) {
+          case 'NotFoundError':
+            // TODO;
+            break;
+          case 'ExpiredError':
+            // TODO
+            break;
+        }
+      });
   }
 
   onLogin = () => {
@@ -65,7 +92,6 @@ export default class Login extends Component {
         argument: `(phone: "${phone}", code: "${code}")`,
       },
     ];
-    console.log(phone);
     Request(
       'mutation',
       `
@@ -75,12 +101,28 @@ export default class Login extends Component {
       }
     `,
     ).then(json => {
-      console.log('登录', json);
-      // 跳转登录
-      // Actions.reset('tabBar');
+      const { mes, token } = json.data[types[type].method];
+      if (token) {
+        // 存储token
+        global.storage.save({
+          key: 'userLoginInfo',
+          data: {
+            token: token,
+          },
+          expires: null,
+        });
+        // 跳转首页
+        Actions.reset('tabBar');
+      } else {
+        ToastAndroid.showWithGravity(
+          mes,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+      }
     });
-    // Alert.alert('触发登录事件');
   };
+
   onRegister = () => {
     Actions.push('register');
   };

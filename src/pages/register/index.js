@@ -56,29 +56,28 @@ export default class Register extends Component {
   }
 
   onSubmit = () => {
-    const isSubmit = true;
     // 再校验一次
-    // let isSubmit = _.reduce(
-    //   this.state.inputList,
-    //   (res, item, index) => {
-    //     const msg = this.onCheck(item, index);
-    //     if (res) {
-    //       return msg === '';
-    //     }
-    //     return res;
-    //   },
-    //   true,
-    // );
+    let isSubmit = _.reduce(
+      this.state.inputList,
+      (res, item, index) => {
+        const msg = this.onCheck(item, index);
+        if (res) {
+          return msg === '';
+        }
+        return res;
+      },
+      true,
+    );
 
-    // // 判断是否输入验证码
-    // if (this.state.code === '') {
-    //   ToastAndroid.showWithGravity(
-    //     '请输入验证码',
-    //     ToastAndroid.SHORT,
-    //     ToastAndroid.CENTER,
-    //   );
-    //   return;
-    // }
+    // 判断是否输入验证码
+    if (this.state.code === '') {
+      ToastAndroid.showWithGravity(
+        '请输入验证码',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+      return;
+    }
 
     if (isSubmit) {
       console.log(this.state.isLoad);
@@ -113,7 +112,7 @@ export default class Register extends Component {
               );
               if (phone === req.phone) {
                 // todo 跳转登录，携带手机号自动填写
-                Actions.reset('login');
+                Actions.reset('login', { phone });
               }
             })
             .finally(() => {

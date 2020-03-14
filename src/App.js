@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import { Actions, Router, Scene, Drawer } from 'react-native-router-flux';
 
-import Nav from '@/components/common/Nav';
-
+import Nav from './components/common/Nav';
+import { storage } from './storage';
 import routes from './routes';
+
+// 全局唯一声明
+global.storage = storage;
 
 export default class App extends Component {
   // 自定义返回

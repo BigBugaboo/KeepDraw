@@ -78,7 +78,7 @@ class List extends Component {
 
   // 列表底部
   ListFooterComponent = () => {
-    return <Text>已经到底了</Text>;
+    return null;
   };
 
   render() {
