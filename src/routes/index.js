@@ -1,7 +1,7 @@
-import Home from '@/pages/home/index';
-import Mine from '@/pages/mine/index';
-import Login from '@/pages/login/index';
-import Register from '@/pages/register/index';
+import Home from '../pages/home/index';
+import Mine from '../pages/mine/index';
+import Login from '../pages/login/index';
+import Register from '../pages/register/index';
 
 export default [
   {
