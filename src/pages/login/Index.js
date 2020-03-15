@@ -111,6 +111,11 @@ export default class Login extends Component {
           },
           expires: null,
         });
+        ToastAndroid.showWithGravity(
+          mes,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
         // 跳转首页
         Actions.reset('tabBar');
       } else {
