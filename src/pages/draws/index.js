@@ -19,7 +19,7 @@ import options from './config';
 
 export default class Draws extends Component {
   handelSelectImage = () => {
-    ImagePicker.showImagePicker(options, response => {
+    ImagePicker.showImagePicker(options(), response => {
       console.log('Response = ', response);
 
       if (response.didCancel) {
