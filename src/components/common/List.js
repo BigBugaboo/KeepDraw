@@ -24,6 +24,7 @@ class ListItem extends Component {
   }
 }
 
+// 列表
 class List extends Component {
   constructor(props) {
     super(props);

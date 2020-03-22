@@ -9,11 +9,11 @@ export default class Button extends Component {
   }
 
   render() {
-    const { onPress, children, type, style, textStyle } = this.props;
+    const { onPress, children, type, style, textStyle, shape } = this.props;
 
     return (
       <TouchableOpacity
-        style={[mineStyles.btn, mineStyles[type], style]}
+        style={[mineStyles.btn, mineStyles[type], style, mineStyles[shape]]}
         onPress={onPress}>
         <Text style={[{ textAlign: 'center' }, mineStyles[type], textStyle]}>
           {children}
@@ -27,6 +27,8 @@ const mineStyles = StyleSheet.create({
   btn: {
     backgroundColor: '#ddd',
     padding: 5,
+  },
+  round: {
     borderRadius: 10,
   },
   link: {
@@ -57,4 +59,5 @@ Button.propsTypes = {
   type: PropTypes.oneOf(['primary', 'warn', 'danger', 'success', 'link']),
   children: PropTypes.element.isRequired,
   onPress: PropTypes.func,
+  shape: PropTypes.oneOf(['round']),
 };

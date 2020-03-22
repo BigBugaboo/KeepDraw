@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { View, StyleSheet } from 'react-native';
 import _ from 'lodash';
 
-// 按钮组件
+// Flex 布局
 export default class Button extends Component {
   constructor(props) {
     super(props);

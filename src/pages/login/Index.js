@@ -279,11 +279,13 @@ export default class Login extends Component {
             <Button
               type="primary"
               style={{ width: 100, margin: 20 }}
+              shape="round"
               onPress={this.onLogin}>
               登录
             </Button>
             <Button
               disable={true}
+              shape="round"
               style={{ width: 100, margin: 20 }}
               onPress={this.onRegister}>
               注册

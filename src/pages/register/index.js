@@ -305,6 +305,7 @@ export default class Register extends Component {
           </View>
           <Button
             type="primary"
+            shape="round"
             style={{ width: '60%', marginLeft: '20%', margin: 20 }}
             onPress={throttle(this.onSubmit)}>
             注册

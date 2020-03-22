@@ -9,6 +9,12 @@ import List from '../../components/common/List';
 
 const menuList = [
   {
+    key: 'draws',
+    title: '画册',
+    path: 'draws',
+    placeholde: '个人画册',
+  },
+  {
     key: 'info',
     title: '个人信息',
     path: '',
@@ -57,6 +63,9 @@ export default class Mine extends React.Component {
         );
         Actions.replace('login');
       },
+      draws: () => {
+        Actions.push('draws');
+      }
     };
     console.log(e);
     if (typeof actions[e.key] !== 'function') {

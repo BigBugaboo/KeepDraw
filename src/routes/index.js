@@ -1,6 +1,7 @@
 import Home from '../pages/home/index';
 import Mine from '../pages/mine/index';
 import Login from '../pages/login/index';
+import Draws from '../pages/draws/index';
 import Register from '../pages/register/index';
 
 export default [
@@ -42,6 +43,16 @@ export default [
       key: 'register',
       hideNavBar: true,
       component: Register,
+    },
+  },
+  {
+    type: 'scene',
+    option: {
+      title: '画册',
+      key: 'draws',
+      initial: true,  // 测试
+      hideNavBar: true,
+      component: Draws,
     },
   },
 ];
