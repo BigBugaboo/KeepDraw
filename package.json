@@ -10,6 +10,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "aliyun-oss-react-native": "^1.0.0-alpha.7",
     "dayjs": "^1.8.23",
     "lodash": "^4.17.15",
     "react": "16.9.0",

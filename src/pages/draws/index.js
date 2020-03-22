@@ -14,12 +14,38 @@ import days from 'dayjs';
 import Flex from '../../components/common/Flex';
 import Button from '../../components/common/Button';
 import List from '../../components/common/List';
+import { uploadImage, downloadImage } from '../../utils';
 
-import options from './config';
+const selectImage = {
+  title: '图片上传',
+  cancelButtonTitle: '取消',
+  takePhotoButtonTitle: '拍照上传',
+  chooseFromLibraryButtonTitle: '选择图片上传',
+  mediaType: 'photo',
+  quality: 1,
+  noData: true,
+  storageOptions: {
+    skipBackup: true,
+    path: 'images',
+  },
+  permissionDenied: {
+    title: '获取拍照权限',
+    text: '获取拍照权限，拍照后上传',
+    reTryTitle: '重试',
+    okTitle: '确认',
+  },
+};
 
 export default class Draws extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      uri: '',
+    };
+  }
+
   handelSelectImage = () => {
-    ImagePicker.showImagePicker(options(), response => {
+    ImagePicker.showImagePicker(selectImage, response => {
       console.log('Response = ', response);
 
       if (response.didCancel) {
@@ -33,12 +59,30 @@ export default class Draws extends Component {
 
         // You can also display the image using data:
         // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-
-        this.setState({
-          avatarSource: source,
-        });
+        // this.setState({
+        //   avatarSource: source,
+        // });
+        console.log('上传图片');
+        uploadImage('image/test/3.jpeg', response.uri)
+          .then(res => {
+            console.log('1', res);
+          })
+          .catch(e => {
+            console.log(e);
+          });
       }
     });
+  };
+
+  handleDown = () => {
+    downloadImage('image/test/2.jpeg')
+      .then(res => {
+        console.log('1', res);
+        this.setState({ uri: res });
+      })
+      .catch(e => {
+        console.log(e);
+      });
   };
 
   render() {
@@ -82,7 +126,7 @@ export default class Draws extends Component {
           data={_.map(arr, (item, index) => ({
             Content: () => (
               <View style={box}>
-                <Image style={img} source={{ uri: item.img }} />
+                <Image style={img} source={{ uri: this.state.uri }} />
                 <View style={infomation}>
                   <View style={info}>
                     <View>
@@ -118,7 +162,12 @@ export default class Draws extends Component {
             id: index,
           }))}
         />
-        <Button type="primary" onPress={this.handelSelectImage}>上传</Button>
+        <Button type="primary" onPress={this.handleDown}>
+          下载
+        </Button>
+        <Button type="primary" onPress={this.handelSelectImage}>
+          上传
+        </Button>
       </>
     );
   }

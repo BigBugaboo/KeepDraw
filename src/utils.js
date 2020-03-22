@@ -1,3 +1,5 @@
+import AliyunOSS from 'aliyun-oss-react-native';
+
 /**
  * throttle 限流
  * @param {func} func 回调
@@ -68,3 +70,62 @@ export const debounce = (func, wait = 1000, immediate = false) => {
     }
   };
 };
+
+/**
+ * uploadImage 上传图片
+ * @param {string} objectKey 图片存储的连接
+ * @param {string} filePath 图片连接
+ */
+
+export const uploadImage = (objectKey, filePath) =>
+  new Promise((resolve, reject) => {
+    const configuration = {
+      maxRetryCount: 3,
+      timeoutIntervalForRequest: 30,
+      timeoutIntervalForResource: 24 * 60 * 60,
+    };
+
+    AliyunOSS.initWithPlainTextAccessKey(
+      'LTAI4Fe3L5JruU7SC1Wesgbh',
+      'HMfxOCJqvA0nqbndEYJi0cHFJhMgOs',
+      'oss-cn-shenzhen.aliyuncs.com',
+      configuration,
+    );
+
+    AliyunOSS.asyncUpload('keepdraw', objectKey, filePath)
+      .then(data => {
+        resolve(data);
+      })
+      .catch(e => {
+        reject(e);
+      });
+  });
+
+/**
+ * downloadImage 下载图片
+ * @param {string} objectKey 图片存储的连接
+ */
+
+export const downloadImage = objectKey =>
+  new Promise((resolve, reject) => {
+    const configuration = {
+      maxRetryCount: 3,
+      timeoutIntervalForRequest: 30,
+      timeoutIntervalForResource: 24 * 60 * 60,
+    };
+
+    AliyunOSS.initWithPlainTextAccessKey(
+      'LTAI4Fe3L5JruU7SC1Wesgbh',
+      'HMfxOCJqvA0nqbndEYJi0cHFJhMgOs',
+      'oss-cn-shenzhen.aliyuncs.com',
+      configuration,
+    );
+
+    AliyunOSS.asyncDownload('keepdraw', objectKey)
+      .then(e => {
+        resolve(e);
+      })
+      .catch(e => {
+        reject(e);
+      });
+  });

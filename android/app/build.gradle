@@ -187,6 +187,8 @@ android {
 }
 
 dependencies {
+    implementation project(':aliyun-oss-react-native')
+    compile project(':aliyun-oss-react-native')
     compile project(':react-native-image-picker')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"  // From node_modules
