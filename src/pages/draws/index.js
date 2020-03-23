@@ -98,8 +98,7 @@ export default class Draws extends Component {
         bad: 20,
       },
       {
-        img:
-          'http://b-ssl.duitang.com/uploads/item/201704/10/20170410095843_SEvMy.thumb.700_0.jpeg',
+        img: this.state.uri,
         date: new Date(),
         name: '名称',
         desc: '1827358712t3812g',
@@ -126,7 +125,7 @@ export default class Draws extends Component {
           data={_.map(arr, (item, index) => ({
             Content: () => (
               <View style={box}>
-                <Image style={img} source={{ uri: this.state.uri }} />
+                <Image style={img} source={{ uri: item.img }} />
                 <View style={infomation}>
                   <View style={info}>
                     <View>
@@ -137,7 +136,7 @@ export default class Draws extends Component {
                     </View>
                     <Flex column>
                       <Text>描述</Text>
-                      <Text numberOfLines={4} style={desc}>
+                      <Text numberOfLines={2} style={desc}>
                         {item.desc}
                       </Text>
                     </Flex>
@@ -185,7 +184,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     backgroundColor: '#fff',
-    height: height / 3,
+    height: height / 4,
     marginBottom: 2,
   },
   img: {

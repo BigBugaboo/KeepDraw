@@ -50,7 +50,6 @@ export default [
     option: {
       title: '画册',
       key: 'draws',
-      initial: true,  // 测试
       hideNavBar: true,
       component: Draws,
     },

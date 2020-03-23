@@ -108,22 +108,9 @@ export const uploadImage = (objectKey, filePath) =>
 
 export const downloadImage = objectKey =>
   new Promise((resolve, reject) => {
-    const configuration = {
-      maxRetryCount: 3,
-      timeoutIntervalForRequest: 30,
-      timeoutIntervalForResource: 24 * 60 * 60,
-    };
-
-    AliyunOSS.initWithPlainTextAccessKey(
-      'LTAI4Fe3L5JruU7SC1Wesgbh',
-      'HMfxOCJqvA0nqbndEYJi0cHFJhMgOs',
-      'oss-cn-shenzhen.aliyuncs.com',
-      configuration,
-    );
-
     AliyunOSS.asyncDownload('keepdraw', objectKey)
       .then(e => {
-        resolve(e);
+        resolve(`file://${e}`);
       })
       .catch(e => {
         reject(e);

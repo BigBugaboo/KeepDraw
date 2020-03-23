@@ -1,26 +1,22 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import {
   Text,
   TouchableOpacity,
-  View,
   Dimensions,
-  FastList,
   VirtualizedList,
 } from 'react-native';
 
 class ListItem extends Component {
   onPress = () => {
     this.props.onPressItem(this.props.id);
+    return this.props.id;
   };
 
   render() {
     const { Content, id } = this.props;
-    return (
-      <TouchableOpacity key={id} onPress={this.onPress}>
-        <Content />
-      </TouchableOpacity>
-    );
+    return <Content key={id} onPress={this.onPress} />;
   }
 }
 
@@ -77,24 +73,21 @@ class List extends Component {
     return <emptyComponent />;
   };
 
-  // 列表底部
-  ListFooterComponent = () => {
-    return null;
-  };
-
   render() {
-    const { style, data } = this.props;
+    const { style, data, initialScrollIndex, ListFooterComponent } = this.props;
     return (
       <VirtualizedList
         style={style}
         data={data}
-        ListFooterComponent={this.ListFooterComponent}
+        ListFooterComponent={ListFooterComponent}
         getItemLayout={this.getItemLayout}
         getItem={this.getItem}
         getItemCount={this.getItemCount}
         extraData={this.state}
         keyExtractor={this.keyExtractor}
         renderItem={this.renderItem}
+        initialScrollIndex={initialScrollIndex}
+        ListEmptyComponent={this.ListEmptyComponent}
       />
     );
   }
@@ -105,10 +98,18 @@ List.propTypes = {
   style: PropTypes.object,
   // 无数据时显示
   emptyComponent: PropTypes.element,
+  // 底部
+  ListFooterComponent: PropTypes.element,
+  // 初始渲染的index
+  initialScrollIndex: PropTypes.number,
+  onCheck: PropTypes.func,
 };
 
 List.defaultProps = {
   emptyComponent: <Text>暂无数据</Text>,
+  ListFooterComponent: null,
+  initialScrollIndex: 0,
+  onCheck: () => null,
 };
 
 export default List;
