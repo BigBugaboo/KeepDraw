@@ -1,12 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import {
-  Text,
-  TouchableOpacity,
-  Dimensions,
-  VirtualizedList,
-} from 'react-native';
+import { Text, Dimensions, VirtualizedList } from 'react-native';
 
 class ListItem extends Component {
   onPress = () => {

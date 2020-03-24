@@ -3,6 +3,7 @@ import Mine from '../pages/mine/index';
 import Login from '../pages/login/index';
 import Draws from '../pages/draws/index';
 import Register from '../pages/register/index';
+import Comment from '../pages/comment/index';
 
 export default [
   {
@@ -52,6 +53,15 @@ export default [
       key: 'draws',
       hideNavBar: true,
       component: Draws,
+    },
+  },
+  {
+    type: 'scene',
+    option: {
+      title: '画册',
+      key: 'comment',
+      hideNavBar: true,
+      component: Comment,
     },
   },
 ];

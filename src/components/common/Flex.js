@@ -4,7 +4,7 @@ import { View, StyleSheet } from 'react-native';
 import _ from 'lodash';
 
 // Flex 布局
-export default class Button extends Component {
+export default class Flex extends Component {
   constructor(props) {
     super(props);
   }
@@ -45,7 +45,7 @@ const mineStyles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   justifyCenter: {
-    justifyContent: 'space-around',
+    justifyContent: 'center',
   },
   justifyEvenly: {
     justifyContent: 'space-evenly',
@@ -61,7 +61,7 @@ const mineStyles = StyleSheet.create({
   },
 });
 
-Button.propsTypes = {
+Flex.propsTypes = {
   children: PropTypes.element.isRequired,
   row: PropTypes.bool,
   column: PropTypes.bool,
