@@ -9,15 +9,7 @@ export default class Button extends Component {
   }
 
   render() {
-    const {
-      onPress,
-      children,
-      type,
-      style,
-      textStyle,
-      shape,
-      size,
-    } = this.props;
+    const { onPress, children, type, style, textStyle, shape } = this.props;
 
     return (
       <TouchableOpacity
@@ -39,9 +31,6 @@ const mineStyles = StyleSheet.create({
   round: {
     borderRadius: 10,
   },
-  circle: {
-    borderRadius: 100,
-  },
   link: {
     backgroundColor: 'transparent',
     padding: 0,
@@ -62,14 +51,16 @@ const mineStyles = StyleSheet.create({
   success: {
     backgroundColor: '#3c5',
   },
+  white: {
+    backgroundColor: '#fff',
+  },
 });
 
 Button.propsTypes = {
   style: PropTypes.object,
   textStyle: PropTypes.object,
-  type: PropTypes.oneOf(['primary', 'warn', 'danger', 'success', 'link']),
+  type: PropTypes.oneOf(['primary', 'warn', 'danger', 'success', 'link', 'white']),
   children: PropTypes.element.isRequired,
   onPress: PropTypes.func,
-  shape: PropTypes.oneOf(['round', 'circle']),
-  size: PropTypes.number,
+  shape: PropTypes.oneOf(['round']),
 };

@@ -1,7 +1,9 @@
 import Home from '../pages/home/index';
 import Mine from '../pages/mine/index';
+import MineInfo from '../pages/mine/info';
 import Login from '../pages/login/index';
 import Draws from '../pages/draws/index';
+import DrawsDetail from '../pages/draws/detail';
 import Register from '../pages/register/index';
 import Comment from '../pages/comment/index';
 
@@ -30,6 +32,16 @@ export default [
   {
     type: 'scene',
     option: {
+      navBarButtonColor: '#39f',
+      title: '修改个人信息',
+      key: 'mineInfo',
+      component: MineInfo,
+      rightTitle: ' ',
+    },
+  },
+  {
+    type: 'scene',
+    option: {
       title: '登录',
       key: 'login',
       initial: true,
@@ -53,6 +65,15 @@ export default [
       key: 'draws',
       hideNavBar: true,
       component: Draws,
+    },
+  },
+  {
+    type: 'scene',
+    option: {
+      title: '画册详情修改',
+      key: 'drawsDetail',
+      component: DrawsDetail,
+      rightTitle: ' ',
     },
   },
   {

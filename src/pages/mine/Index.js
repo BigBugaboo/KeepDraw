@@ -9,28 +9,22 @@ import List from '../../components/common/List';
 
 const menuList = [
   {
-    key: 'draws',
-    title: '画册',
-    path: 'draws',
-    placeholde: '个人画册',
-  },
-  {
     key: 'info',
     title: '个人信息',
     path: '',
     placeholde: '可修改个人信息',
   },
   {
-    key: 'money',
-    title: '打赏',
-    path: '',
-    placeholde: '打赏点钱给苦命点程序员',
+    key: 'draws',
+    title: '画册',
+    path: 'draws',
+    placeholde: '个人画册',
   },
   {
-    key: 'suggest',
-    title: '投诉建议',
-    path: '',
-    placeholde: '提交投诉申请',
+    key: 'copyDraws',
+    title: '临摹',
+    path: 'copyDraws',
+    placeholde: '临摹功能',
   },
   {
     key: 'logout',
@@ -65,6 +59,9 @@ export default class Mine extends React.Component {
       },
       draws: () => {
         Actions.push('draws');
+      },
+      info: () => {
+        Actions.push('mineInfo');
       }
     };
     console.log(e);
@@ -148,7 +145,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   menuItem: {
-    padding: 10,
     backgroundColor: '#fff',
   },
   menuItemText: {

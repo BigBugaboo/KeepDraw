@@ -1,15 +1,11 @@
 import React, { Component } from 'react';
 import {
   Text,
-  View,
   StyleSheet,
-  TouchableHighlight,
   TouchableOpacity,
-  FlatList,
-  PanResponder,
-  Image,
-  TouchableWithoutFeedback,
+  TextInput,
   Dimensions,
+  View,
 } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 
@@ -42,7 +38,6 @@ export default class Home extends Component {
   }
 
   render() {
-    const { list } = styles;
     return (
       <>
         <List
@@ -51,15 +46,18 @@ export default class Home extends Component {
               已经到底了~~
             </Text>
           }
-          style={list}
+          style={styles.list}
           data={_.map(arr, (item, index) => ({
             Content: props => <Content data={item} index={index} {...props} />,
             id: index,
           }))}
         />
-        <TouchableOpacity onPress={this.handlePress} style={styles.replyBtn}>
-          <Text style={{ color: '#fff' }}>回复</Text>
-        </TouchableOpacity>
+        <View style={styles.reply}>
+          <TextInput style={styles.replyInput} placeholder="请输入回复内容" />
+          <TouchableOpacity onPress={this.handlePress} style={styles.replyBtn}>
+            <Text style={{ color: '#fff' }}>回复</Text>
+          </TouchableOpacity>
+        </View>
       </>
     );
   }
@@ -111,12 +109,25 @@ const styles = StyleSheet.create({
   comment: {
     padding: 4,
   },
-  replyBtn: {
+  reply: {
     position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
+  },
+  replyInput: {
+    borderColor: '#999',
+    borderWidth: 1,
+    borderStyle: 'solid',
+    backgroundColor: '#dfdfdf',
+    margin: 4,
+    height: 40,
+  },
+  replyBtn: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    bottom: 0,
     backgroundColor: '#39f',
     width: '100%',
     height: 40,

@@ -10,6 +10,7 @@ import {
 import ImagePicker from 'react-native-image-picker';
 import _ from 'lodash';
 import days from 'dayjs';
+import { Actions } from 'react-native-router-flux';
 
 import Flex from '../../components/common/Flex';
 import Button from '../../components/common/Button';
@@ -85,6 +86,12 @@ export default class Draws extends Component {
       });
   };
 
+  handleDetail = () => {
+    Actions.push('drawsDetail', {
+      id: this.state.id,
+    });
+  };
+
   render() {
     const arr = [
       {
@@ -136,24 +143,16 @@ export default class Draws extends Component {
                     </View>
                     <Flex column>
                       <Text>描述</Text>
-                      <Text numberOfLines={2} style={desc}>
+                      <Text numberOfLines={4} style={desc}>
                         {item.desc}
                       </Text>
-                    </Flex>
-                    <Flex>
-                      <Flex row>
-                        <Text>欣赏：</Text>
-                        <Text>{item.good}</Text>
-                      </Flex>
-                      <Flex row>
-                        <Text>不喜欢：</Text>
-                        <Text>{item.bad}</Text>
-                      </Flex>
                     </Flex>
                   </View>
                   <View style={banner}>
                     <Button type="danger">删除</Button>
-                    <Button type="deafult">修改</Button>
+                    <Button type="deafult" onPress={this.handleDetail}>
+                      修改
+                    </Button>
                   </View>
                 </View>
               </View>
@@ -202,7 +201,6 @@ const styles = StyleSheet.create({
     width: '80%',
     padding: 5,
     display: 'flex',
-    justifyContent: 'space-between',
   },
   banner: {
     width: '20%',
