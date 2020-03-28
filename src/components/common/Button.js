@@ -27,6 +27,9 @@ const mineStyles = StyleSheet.create({
   btn: {
     backgroundColor: '#ddd',
     padding: 5,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   round: {
     borderRadius: 10,
@@ -42,7 +45,7 @@ const mineStyles = StyleSheet.create({
   },
   warn: {
     backgroundColor: '#fc0',
-    color: '#fff',
+    color: '#343434',
   },
   danger: {
     backgroundColor: '#f33',
@@ -59,7 +62,14 @@ const mineStyles = StyleSheet.create({
 Button.propsTypes = {
   style: PropTypes.object,
   textStyle: PropTypes.object,
-  type: PropTypes.oneOf(['primary', 'warn', 'danger', 'success', 'link', 'white']),
+  type: PropTypes.oneOf([
+    'primary',
+    'warn',
+    'danger',
+    'success',
+    'link',
+    'white',
+  ]),
   children: PropTypes.element.isRequired,
   onPress: PropTypes.func,
   shape: PropTypes.oneOf(['round']),

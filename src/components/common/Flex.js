@@ -41,8 +41,17 @@ const mineStyles = StyleSheet.create({
   column: {
     flexDirection: 'column',
   },
+  wrap: {
+    flexWrap: 'wrap',
+  },
+  noWrap: {
+    flexWrap: 'nowrap',
+  },
   justifyAround: {
     justifyContent: 'space-around',
+  },
+  justifyBetween: {
+    justifyContent: 'space-between',
   },
   justifyCenter: {
     justifyContent: 'center',
@@ -65,10 +74,13 @@ Flex.propsTypes = {
   children: PropTypes.element.isRequired,
   row: PropTypes.bool,
   column: PropTypes.bool,
+  wrap: PropTypes.bool,
+  noWrap: PropTypes.bool,
   justifyAround: PropTypes.bool,
+  justifyBetween: PropTypes.bool,
   justifyCenter: PropTypes.bool,
   justifyEvenly: PropTypes.bool,
   justifyStart: PropTypes.bool,
   justifyEnd: PropTypes.bool,
   alignCenter: PropTypes.bool,
-}
+};

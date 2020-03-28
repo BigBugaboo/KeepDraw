@@ -10,6 +10,16 @@ const menu = [
     method: 'reset',
   },
   {
+    key: 'draws',
+    title: '画册',
+    method: 'draws',
+  },
+  {
+    key: 'copyDraws',
+    title: '临摹',
+    method: 'copyDraws',
+  },
+  {
     key: 'mine',
     title: '我的信息',
     method: 'push',
@@ -48,14 +58,15 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   menuItem: {
-    backgroundColor: '#39f',
+    backgroundColor: '#fff',
     display: 'flex',
     padding: 10,
-    borderWidth: 1,
-    borderColor: '#fff',
+    borderLeftWidth: 10,
+    borderLeftColor: '#39f',
+    borderStyle: 'solid',
   },
   itemText: {
-    color: '#fff',
+    color: '#39f',
     textAlign: 'center',
   },
 });

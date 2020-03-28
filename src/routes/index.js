@@ -1,3 +1,5 @@
+import { Actions } from 'react-native-router-flux';
+
 import Home from '../pages/home/index';
 import Mine from '../pages/mine/index';
 import MineInfo from '../pages/mine/info';
@@ -6,6 +8,9 @@ import Draws from '../pages/draws/index';
 import DrawsDetail from '../pages/draws/detail';
 import Register from '../pages/register/index';
 import Comment from '../pages/comment/index';
+import CopyDraws from '../pages/copyDraws/index';
+import CopyDrawsDetail from '../pages/copyDraws/detail';
+import Sort from '../pages/sort/index';
 
 export default [
   {
@@ -14,19 +19,27 @@ export default [
       drawer: true,
       key: 'tabBar', // 必须存在默认的 tabbar 的 key
       component: Home,
+      leftTitle: '分类',
+      onLeft: () => {
+        Actions.push('sort');
+      },
     },
   },
   {
     type: 'scene',
     option: {
-      navBarButtonColor: '#39f',
+      title: '分类',
+      key: 'sort', // 必须存在默认的 tabbar 的 key
+      component: Sort,
+    },
+  },
+  {
+    type: 'scene',
+    option: {
       title: '个人信息',
       key: 'mine',
       component: Mine,
-      rightTitle: '123',
-      onRight: () => {
-        console.log('right');
-      },
+      rightTitle: ' ',
     },
   },
   {
@@ -79,10 +92,28 @@ export default [
   {
     type: 'scene',
     option: {
-      title: '画册',
+      title: '评论',
       key: 'comment',
       hideNavBar: true,
       component: Comment,
+    },
+  },
+  {
+    type: 'scene',
+    option: {
+      title: '临摹',
+      key: 'copyDraws',
+      hideNavBar: true,
+      component: CopyDraws,
+    },
+  },
+  {
+    type: 'scene',
+    option: {
+      title: '临摹列表',
+      key: 'copyDrawsDetail',
+      hideNavBar: true,
+      component: CopyDrawsDetail,
     },
   },
 ];

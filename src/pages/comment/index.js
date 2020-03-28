@@ -52,12 +52,16 @@ export default class Home extends Component {
             id: index,
           }))}
         />
-        <View style={styles.reply}>
+        <Flex style={styles.reply} alignCenter>
           <TextInput style={styles.replyInput} placeholder="请输入回复内容" />
-          <TouchableOpacity onPress={this.handlePress} style={styles.replyBtn}>
-            <Text style={{ color: '#fff' }}>回复</Text>
-          </TouchableOpacity>
-        </View>
+          <Button
+            style={styles.replyBtn}
+            onPress={this.handlePress}
+            type="primary">
+            回复
+          </Button>
+          <Button style={styles.replyBtn}>收藏</Button>
+        </Flex>
       </>
     );
   }
@@ -123,13 +127,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#dfdfdf',
     margin: 4,
     height: 40,
+    flex: 8,
   },
   replyBtn: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#39f',
-    width: '100%',
+    flex: 2,
     height: 40,
   },
 });

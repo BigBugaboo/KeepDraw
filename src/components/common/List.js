@@ -63,13 +63,14 @@ class List extends Component {
     };
   };
 
-  // 空数据的时候，显示
-  ListEmptyComponent = () => {
-    return <emptyComponent />;
-  };
-
   render() {
-    const { style, data, initialScrollIndex, ListFooterComponent } = this.props;
+    const {
+      style,
+      data,
+      initialScrollIndex,
+      ListFooterComponent,
+      EmptyComponent,
+    } = this.props;
     return (
       <VirtualizedList
         style={style}
@@ -82,7 +83,7 @@ class List extends Component {
         keyExtractor={this.keyExtractor}
         renderItem={this.renderItem}
         initialScrollIndex={initialScrollIndex}
-        ListEmptyComponent={this.ListEmptyComponent}
+        ListEmptyComponent={EmptyComponent}
       />
     );
   }
@@ -92,7 +93,7 @@ List.propTypes = {
   data: PropTypes.array,
   style: PropTypes.object,
   // 无数据时显示
-  emptyComponent: PropTypes.element,
+  EmptyComponent: PropTypes.element,
   // 底部
   ListFooterComponent: PropTypes.element,
   // 初始渲染的index
@@ -101,7 +102,7 @@ List.propTypes = {
 };
 
 List.defaultProps = {
-  emptyComponent: <Text>暂无数据</Text>,
+  EmptyComponent: <Text>暂无数据</Text>,
   ListFooterComponent: null,
   initialScrollIndex: 0,
   onCheck: () => null,

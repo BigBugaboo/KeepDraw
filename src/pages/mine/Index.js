@@ -12,26 +12,22 @@ const menuList = [
     key: 'info',
     title: '个人信息',
     path: '',
-    placeholde: '可修改个人信息',
   },
   {
     key: 'draws',
-    title: '画册',
+    title: '修改密码',
     path: 'draws',
-    placeholde: '个人画册',
   },
   {
     key: 'copyDraws',
-    title: '临摹',
+    title: '收藏集',
     path: 'copyDraws',
-    placeholde: '临摹功能',
   },
   {
     key: 'logout',
     title: '注销',
     path: '',
     color: '#d23',
-    placeholde: '退出此账号',
   },
 ];
 
@@ -145,12 +141,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   menuItem: {
+    width: '100%',
     backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#dfdfdf',
   },
   menuItemText: {
     color: '#39f',
-    borderBottomWidth: 1,
     padding: 10,
-    borderBottomColor: '#dfdfdf',
   },
 });
