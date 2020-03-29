@@ -1,4 +1,8 @@
 import AliyunOSS from 'aliyun-oss-react-native';
+import ImagePicker from 'react-native-image-picker';
+import uuid from 'rn-uuid';
+import _ from 'lodash';
+import { Request, getLoginInfo } from './api/index';
 
 /**
  * throttle 限流
@@ -93,8 +97,8 @@ export const uploadImage = (objectKey, filePath) =>
     );
 
     AliyunOSS.asyncUpload('keepdraw', objectKey, filePath)
-      .then(data => {
-        resolve(data);
+      .then(e => {
+        resolve(objectKey);
       })
       .catch(e => {
         reject(e);
@@ -126,6 +130,79 @@ export const downloadImage = objectKey =>
         resolve(`file://${e}`);
       })
       .catch(e => {
-        reject(e);
+        reject(false);
       });
   });
+
+// 图片选择配置
+const selectImageConfig = {
+  title: '图片上传',
+  cancelButtonTitle: '取消',
+  takePhotoButtonTitle: '拍照上传',
+  chooseFromLibraryButtonTitle: '选择图片上传',
+  mediaType: 'photo',
+  quality: 1,
+  noData: true,
+  storageOptions: {
+    skipBackup: true,
+    path: 'images',
+  },
+  permissionDenied: {
+    title: '获取拍照权限',
+    text: '获取拍照权限，拍照后上传',
+    reTryTitle: '重试',
+    okTitle: '确认',
+  },
+};
+/**
+ * selectImage 选择图片
+ * @param {number} storageType 存储分类 0: 头像, 1: 画册, 2: 临摹
+ * @param {number} imgType 图片分类
+ */
+export const selectImage = async (callBack, storageType, imgType = -1) => {
+  const storageTypes = ['avatar', 'draws', 'copyDraws'];
+  const imgTypes = [];
+  ImagePicker.showImagePicker(selectImageConfig, async response => {
+    if (response.didCancel) {
+      console.log('用户取消选择图片');
+    } else if (response.error) {
+      console.log('ImagePicker Error: ', response.error);
+    } else if (response.customButton) {
+      console.log('User tapped custom button: ', response.customButton);
+    } else {
+      // You can also display the image using data:
+      // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+      // this.setState({
+      //   avatarSource: source,
+      // });
+      let image_type = '';
+      const is_image = _.some(['jpeg', 'png', 'jpg'], i => {
+        const res = response.type.indexOf(i) !== -1;
+        image_type = res ? i : '';
+        return res;
+      });
+
+      if (is_image) {
+        const img_id = uuid.v4();
+        const typrSort = storageTypes[storageType];
+        if (!typrSort) {
+          return false;
+        }
+        getLoginInfo().then(res => {
+          uploadImage(
+            `image/${typrSort}/${res.phone}/${img_id}.${image_type}`,
+            response.uri,
+          )
+            .then(r => {
+              callBack({ path: response.uri, uri: r });
+            })
+            .catch(() => {
+              callBack(false);
+            });
+        });
+      } else {
+        return false;
+      }
+    }
+  });
+};

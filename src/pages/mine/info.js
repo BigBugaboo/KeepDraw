@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Text,
   View,
@@ -6,14 +6,15 @@ import {
   Image,
   ToastAndroid,
   TextInput,
-  TouchableOpacity
+  TouchableOpacity,
 } from 'react-native';
 import { Actions } from 'react-native-router-flux';
-import _ from 'lodash';
 
+import { selectImage, downloadImage } from '../../utils';
+import { Request, getLoginInfo } from '../../api/index';
 import Loading from '../../components/common/Loading';
+import Flex from '../../components/common/Flex';
 import Button from '../..//components/common/Button';
-import List from '../../components/common/List';
 
 export default class MineInfo extends React.Component {
   constructor(props) {
@@ -21,11 +22,35 @@ export default class MineInfo extends React.Component {
 
     this.state = {
       loading: false,
+      editAvatar: '',
+      showAvatar: '',
+      name: '',
     };
   }
 
+  componentDidMount() {
+    getLoginInfo();
+  }
+
+  handleUpdateAvatar = async () => {
+    selectImage(res => {
+      if (res) {
+        this.setState({ avatar: res.url, showAvatar: res.path });
+        ToastAndroid.showWithGravity(
+          '上传成功',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+      }
+    }, 0);
+  };
+
+  handleChangeText = val => {
+    this.setState({ name: val })
+  };
+
   render() {
-    const { loading } = this.state;
+    const { loading, name, showAvatar } = this.state;
 
     return (
       <View style={styles.container}>
@@ -34,17 +59,25 @@ export default class MineInfo extends React.Component {
           onLoadStart={() => this.setState({ loading: true })}
           onLoadEnd={() => this.setState({ loading: false })}
         />
-        <Image
-          style={styles.avatar}
-          source={{
-            uri:
-              'http://b-ssl.duitang.com/uploads/item/201704/10/20170410095843_SEvMy.thumb.700_0.jpeg',
-          }}
-        />
-        <Button type="white" shape="round">
-          更换头像
+        {showAvatar ? (
+          <Image style={styles.avatar} source={{ uri: showAvatar }} />
+        ) : (
+          <Flex
+            style={[styles.avatar, { backgroundColor: '#ddd' }]}
+            alignCenter
+            justifyCenter>
+            <Text>未设置头像</Text>
+          </Flex>
+        )}
+        <Button type="white" shape="round" onPress={this.handleUpdateAvatar}>
+          {showAvatar ? '更换头像' : '设置头像'}
         </Button>
-        <TextInput style={styles.avatarName} value="NMSL" />
+        <TextInput
+          style={styles.avatarName}
+          value={name}
+          maxLength={8}
+          onChangeText={this.handleChangeText}
+        />
         <TouchableOpacity style={styles.bannerSubmit}>
           <Text style={styles.btnText}>保存</Text>
         </TouchableOpacity>
@@ -91,5 +124,5 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     borderColor: '#39f',
     padding: 30,
-  }
+  },
 });

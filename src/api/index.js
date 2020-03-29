@@ -1,14 +1,14 @@
 import { ToastAndroid } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 
-const getToken = () => {
-  global.storage
+export const getLoginInfo = async () => {
+  return global.storage
     .load({
       key: 'userLoginInfo',
     })
     .then(res => {
-      if (res.token) {
-        return res.token;
+      if (res.token && res.phone) {
+        return res;
       } else {
         ToastAndroid.showWithGravity(
           '账号信息错误，请重新登录',
@@ -19,6 +19,15 @@ const getToken = () => {
       }
     })
     .catch(e => {
+      // 如果没有找到数据且没有sync方法，
+      // 或者有其他异常，则在catch中返回
+      console.warn(e.message);
+      switch (e.name) {
+        case 'NotFoundError':
+          break;
+        case 'ExpiredError':
+          break;
+      }
       console.log('warnning', e);
       ToastAndroid.showWithGravity(
         '账号信息错误，请重新登录',
@@ -27,7 +36,6 @@ const getToken = () => {
       );
       Actions.reset('login');
     });
-  return;
 };
 
 const base_url = 'http://192.168.3.3:3000/graphql';

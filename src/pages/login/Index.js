@@ -13,7 +13,7 @@ import _ from 'lodash';
 import Button from '../../components/common/Button';
 import Flex from '../../components/common/Flex';
 import Loading from '../../components/common/Loading';
-import { Request } from '../../api/index';
+import { Request, getLoginInfo } from '../../api/index';
 
 export default class Login extends Component {
   constructor(props) {
@@ -30,30 +30,12 @@ export default class Login extends Component {
   }
 
   componentDidMount() {
-    global.storage
-      .load({
-        key: 'userLoginInfo',
-      })
-      .then(ret => {
-        // 如果找到数据，则在then方法中返回
-        if (ret.token) {
-          // 跳转首页
-          Actions.reset('tabBar');
-        }
-      })
-      .catch(err => {
-        // 如果没有找到数据且没有sync方法，
-        // 或者有其他异常，则在catch中返回
-        console.warn(err.message);
-        switch (err.name) {
-          case 'NotFoundError':
-            // TODO;
-            break;
-          case 'ExpiredError':
-            // TODO
-            break;
-        }
-      });
+    getLoginInfo().then(res => {
+      if (res) {
+        // 如果找到数据，则跳转首页
+        Actions.reset('tabBar');
+      }
+    });
   }
 
   onLogin = () => {
@@ -108,6 +90,7 @@ export default class Login extends Component {
           key: 'userLoginInfo',
           data: {
             token: token,
+            phone,
           },
           expires: null,
         });

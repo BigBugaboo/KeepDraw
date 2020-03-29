@@ -10,7 +10,7 @@ import List from '../../components/common/List';
 const menuList = [
   {
     key: 'info',
-    title: '个人信息',
+    title: '修改个人信息',
     path: '',
   },
   {

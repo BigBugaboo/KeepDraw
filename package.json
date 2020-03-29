@@ -17,7 +17,8 @@
     "react-native": "0.61.5",
     "react-native-image-picker": "^2.3.1",
     "react-native-router-flux": "^4.0.6",
-    "react-native-storage": "^1.0.1"
+    "react-native-storage": "^1.0.1",
+    "rn-uuid": "^1.5.1"
   },
   "devDependencies": {
     "@babel/core": "^7.7.4",
