@@ -51,12 +51,17 @@ export default class MineInfo extends React.Component {
     ).then(res => {
       const { name, avatar, code, mes } = res.data.getAccount;
       avatar &&
-        downloadImage(avatar).then(img => {
-          this.setState({
-            loading: false,
-            showAvatar: img,
+        downloadImage(avatar)
+          .then(img => {
+            this.setState({
+              showAvatar: img,
+            });
+          })
+          .finally(() => {
+            this.setState({
+              loading: false,
+            });
           });
-        });
       if (code === 1) {
         ToastAndroid.showWithGravity(
           mes,
