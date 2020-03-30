@@ -47,6 +47,7 @@ export default [
     option: {
       navBarButtonColor: '#39f',
       title: '修改个人信息',
+      initial: true,
       key: 'mineInfo',
       component: MineInfo,
       rightTitle: ' ',
@@ -57,7 +58,7 @@ export default [
     option: {
       title: '登录',
       key: 'login',
-      initial: true,
+      // initial: true,
       hideNavBar: true,
       component: Login,
     },

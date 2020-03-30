@@ -29,13 +29,53 @@ export default class MineInfo extends React.Component {
   }
 
   componentDidMount() {
-    getLoginInfo();
+    getLoginInfo().then(res => {
+      this.handleGetInfo(res.phone, res.token);
+    });
   }
+
+  handleGetInfo = (phone, token) => {
+    this.setState({
+      loading: true,
+    });
+    Request(
+      'query',
+      `
+      getAccount(phone: "${phone}", token: "${token}") {
+        mes
+        code
+        name
+        avatar
+      }
+    `,
+    ).then(res => {
+      const { name, avatar, code, mes } = res.data.getAccount;
+      avatar &&
+        downloadImage(avatar).then(img => {
+          this.setState({
+            loading: false,
+            showAvatar: img,
+          });
+        });
+      if (code === 1) {
+        ToastAndroid.showWithGravity(
+          mes,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        Actions.reset('tabBar');
+      }
+      this.setState({
+        name,
+        showAvatar: avatar,
+      });
+    });
+  };
 
   handleUpdateAvatar = async () => {
     selectImage(res => {
       if (res) {
-        this.setState({ avatar: res.url, showAvatar: res.path });
+        this.setState({ editAvatar: res.uri, showAvatar: res.path });
         ToastAndroid.showWithGravity(
           '上传成功',
           ToastAndroid.SHORT,
@@ -46,7 +86,36 @@ export default class MineInfo extends React.Component {
   };
 
   handleChangeText = val => {
-    this.setState({ name: val })
+    this.setState({ name: val });
+  };
+
+  handleSubmit = () => {
+    getLoginInfo().then(res => {
+      Request(
+        'mutation',
+        `
+        editAccountInfo(
+          phone: "${res.phone}", 
+          token: "${res.token}",
+          name: "${this.state.name}",
+          avatar: "${this.state.editAvatar || this.state.showAvatar}"
+        ) {
+          mes
+          code
+        }
+      `,
+      ).then(json => {
+        const { mes, code } = json.data.editAccountInfo;
+        ToastAndroid.showWithGravity(
+          mes,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        if (code === 1) {
+          Actions.reset('tabBar');
+        }
+      });
+    });
   };
 
   render() {
@@ -78,7 +147,9 @@ export default class MineInfo extends React.Component {
           maxLength={8}
           onChangeText={this.handleChangeText}
         />
-        <TouchableOpacity style={styles.bannerSubmit}>
+        <TouchableOpacity
+          style={styles.bannerSubmit}
+          onPress={this.handleSubmit}>
           <Text style={styles.btnText}>保存</Text>
         </TouchableOpacity>
       </View>
@@ -109,8 +180,6 @@ const styles = StyleSheet.create({
     width: '50%',
   },
   bannerSubmit: {
-    position: 'absolute',
-    bottom: 40,
     backgroundColor: '#fff',
     padding: 5,
     display: 'flex',
