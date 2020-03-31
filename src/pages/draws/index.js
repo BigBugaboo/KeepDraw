@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableHighlight,
   Image,
+  ToastAndroid,
   Dimensions,
 } from 'react-native';
 import _ from 'lodash';
@@ -15,6 +16,7 @@ import Flex from '../../components/common/Flex';
 import Button from '../../components/common/Button';
 import List from '../../components/common/List';
 import { selectImage, downloadImage } from '../../utils';
+import { Request, getLoginInfo } from '../../api/index';
 
 export default class Draws extends Component {
   constructor(props) {
@@ -24,8 +26,45 @@ export default class Draws extends Component {
     };
   }
 
-  handelSelectImage = () => {
-    selectImage();
+  componentDidMount() {
+    // todo 获取个人画册
+    // getLoginInfo().then(res => {
+    //   this.handleGetInfo(res.phone, res.token);
+    // });
+  }
+
+  handleUpdateload = () => {
+    selectImage(res => {
+      if (res) {
+        this.handleUpdateImage(res.uri);
+      }
+    }, 0);
+  };
+
+  handleUpdateImage = src => {
+    getLoginInfo().then(res => {
+      Request(
+        'mutation',
+        `addDraws(
+          phone: "${res.phone}", 
+          token: "${res.token}", 
+          src: "${src}"
+        ) {
+          mes
+          code
+        }`,
+      ).then(json => {
+        const { code, mes } = json.data.addDraws;
+        ToastAndroid.showWithGravity(
+          mes,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        if (code === 1) {
+          Actions.reset('tabBar');
+        }
+      });
+    });
   };
 
   handleDown = () => {
@@ -113,10 +152,7 @@ export default class Draws extends Component {
             id: index,
           }))}
         />
-        <Button type="primary" onPress={this.handleDown}>
-          下载
-        </Button>
-        <Button type="primary" onPress={this.handelSelectImage}>
+        <Button type="primary" onPress={this.handleUpdateload}>
           上传
         </Button>
       </>
