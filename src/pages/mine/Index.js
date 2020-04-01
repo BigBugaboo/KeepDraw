@@ -58,7 +58,7 @@ export default class Mine extends React.Component {
       },
       info: () => {
         Actions.push('mineInfo');
-      }
+      },
     };
     console.log(e);
     if (typeof actions[e.key] !== 'function') {
@@ -81,11 +81,7 @@ export default class Mine extends React.Component {
 
     return (
       <View style={container}>
-        <Loading
-          show={loading}
-          onLoadStart={() => this.setState({ loading: true })}
-          onLoadEnd={() => this.setState({ loading: false })}
-        />
+        <Loading show={loading} />
         <Image
           style={avatar}
           source={{

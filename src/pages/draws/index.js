@@ -14,6 +14,7 @@ import { Actions } from 'react-native-router-flux';
 
 import Flex from '../../components/common/Flex';
 import Button from '../../components/common/Button';
+import Loading from '../../components/common/Loading';
 import List from '../../components/common/List';
 import { selectImage, downloadImage } from '../../utils';
 import { Request, getLoginInfo } from '../../api/index';
@@ -23,6 +24,10 @@ export default class Draws extends Component {
     super(props);
     this.state = {
       uri: '',
+      list: [],
+      loading: true,
+      more: true,
+      offset: 0,
     };
   }
 
@@ -31,7 +36,49 @@ export default class Draws extends Component {
     // getLoginInfo().then(res => {
     //   this.handleGetInfo(res.phone, res.token);
     // });
+    this.handleGetDraws();
   }
+
+  handleGetDraws = async () => {
+    this.setState({ loading: true });
+    getLoginInfo().then(res => {
+      Request(
+        'query',
+        `getDraws(
+          offset: ${this.state.offset},
+          sort: "",
+          phone: "${res.phone}", 
+          token: "${res.token}", 
+        ) {
+          list {
+            _id
+            title
+            src
+            author
+            desc
+            publish
+            comments
+            updatedAt
+            createdAt
+          }
+          more
+        }`,
+      )
+        .then(json => {
+          const { more, list } = json.data.getDraws;
+          _.forEach(list, (item, index) => {
+            this.handleDown(index, item.src);
+          });
+          this.setState({
+            list: _.concat(list, this.state.list),
+            more,
+          });
+        })
+        .finally(() => {
+          this.setState({ loading: false });
+        });
+    });
+  };
 
   handleUpdateload = () => {
     selectImage(res => {
@@ -67,44 +114,25 @@ export default class Draws extends Component {
     });
   };
 
-  handleDown = () => {
-    downloadImage('image/test/2.jpeg')
+  handleDown = (index, src) => {
+    downloadImage(src)
       .then(res => {
-        console.log('1', res);
-        this.setState({ uri: res });
+        const list = _.cloneDeep(this.state.list);
+        list[index].src = res;
+        this.setState({ list });
       })
       .catch(e => {
         console.log(e);
       });
   };
 
-  handleDetail = () => {
+  handleDetail = item => {
     Actions.push('drawsDetail', {
-      id: this.state.id,
+      ...item,
     });
   };
 
   render() {
-    const arr = [
-      {
-        img:
-          'http://b-ssl.duitang.com/uploads/item/201704/10/20170410095843_SEvMy.thumb.700_0.jpeg',
-        date: new Date(),
-        name: '名称',
-        desc:
-          '1827358712t38111111111111111111112222222222222222222222222222222222222222222222222211111111111111111111111111111111112g',
-        good: 16,
-        bad: 20,
-      },
-      {
-        img: this.state.uri,
-        date: new Date(),
-        name: '名称',
-        desc: '1827358712t3812g',
-        good: 16,
-        bad: 20,
-      },
-    ];
     const {
       content,
       box,
@@ -116,40 +144,54 @@ export default class Draws extends Component {
       banner,
       info,
     } = styles;
+    const { loading, list } = this.state;
 
     return (
       <>
+        <Loading show={loading} />
         <List
           style={content}
-          data={_.map(arr, (item, index) => ({
+          ListFooterComponent={
+            <Flex justifyCenter>
+              <Button style={{ width: '20%' }} type="white">
+                加载更多
+              </Button>
+            </Flex>
+          }
+          data={_.map(list, (item, index) => ({
             Content: () => (
               <View style={box}>
-                <Image style={img} source={{ uri: item.img }} />
+                <Image style={img} source={{ uri: item.src }} />
                 <View style={infomation}>
                   <View style={info}>
                     <View>
-                      <Text style={name}>{item.name}</Text>
+                      <Text style={name}>{item.title || '未设置标题'}</Text>
+                      <Text>作者：{item.author}</Text>
                       <Text style={date}>
-                        {days(item.date).format('YYYY-MM-DD HH:mm')}
+                        {days(_.toNumber(item.updatedAt)).format(
+                          'YYYY-MM-DD HH:mm',
+                        )}
                       </Text>
                     </View>
                     <Flex column>
                       <Text>描述</Text>
-                      <Text numberOfLines={4} style={desc}>
+                      <Text numberOfLines={2} style={desc}>
                         {item.desc}
                       </Text>
                     </Flex>
                   </View>
                   <View style={banner}>
                     <Button type="danger">删除</Button>
-                    <Button type="deafult" onPress={this.handleDetail}>
+                    <Button
+                      type="deafult"
+                      onPress={this.handleDetail.bind(this, item)}>
                       修改
                     </Button>
                   </View>
                 </View>
               </View>
             ),
-            id: index,
+            id: item._id,
           }))}
         />
         <Button type="primary" onPress={this.handleUpdateload}>
