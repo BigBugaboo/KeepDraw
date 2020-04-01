@@ -22,14 +22,14 @@ export default class DrawsDetail extends Component {
   constructor(props) {
     super(props);
 
-    const { publish, desc, author, updatedAt, sort, title } = this.props;
+    const { publish, desc, author, createdAt, sort, title } = this.props;
     this.state = {
       publish: !!publish,
       title,
       author,
       desc,
       sort,
-      updatedAt,
+      createdAt,
     };
   }
 
@@ -38,7 +38,7 @@ export default class DrawsDetail extends Component {
   }
 
   render() {
-    const { publish, updatedAt, author, sort, title, desc } = this.state;
+    const { publish, createdAt, author, sort, title, desc } = this.state;
 
     return (
       <View style={styles.content}>
@@ -58,7 +58,7 @@ export default class DrawsDetail extends Component {
         <View style={styles.inputItem}>
           <Text style={styles.label}>时间：</Text>
           <Text>
-            {days(_.toNumber(updatedAt)).format('YYYY-MM-DD HH:mm:ss')}
+            {days(_.toNumber(createdAt)).format('YYYY-MM-DD HH:mm:ss')}
           </Text>
         </View>
         <View style={styles.inputItem}>

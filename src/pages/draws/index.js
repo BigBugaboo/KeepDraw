@@ -168,7 +168,7 @@ export default class Draws extends Component {
                       <Text style={name}>{item.title || '未设置标题'}</Text>
                       <Text>作者：{item.author}</Text>
                       <Text style={date}>
-                        {days(_.toNumber(item.updatedAt)).format(
+                        {days(_.toNumber(item.createdAt)).format(
                           'YYYY-MM-DD HH:mm',
                         )}
                       </Text>
