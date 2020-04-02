@@ -64,13 +64,7 @@ class List extends Component {
   };
 
   render() {
-    const {
-      style,
-      data,
-      initialScrollIndex,
-      ListFooterComponent,
-      EmptyComponent,
-    } = this.props;
+    const { style, data, initialScrollIndex, ListFooterComponent } = this.props;
     return (
       <VirtualizedList
         style={style}
@@ -83,7 +77,6 @@ class List extends Component {
         keyExtractor={this.keyExtractor}
         renderItem={this.renderItem}
         initialScrollIndex={initialScrollIndex}
-        ListEmptyComponent={EmptyComponent}
       />
     );
   }
@@ -92,8 +85,6 @@ class List extends Component {
 List.propTypes = {
   data: PropTypes.array,
   style: PropTypes.object,
-  // 无数据时显示
-  EmptyComponent: PropTypes.element,
   // 底部
   ListFooterComponent: PropTypes.element,
   // 初始渲染的index

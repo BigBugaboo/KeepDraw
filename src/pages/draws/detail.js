@@ -7,6 +7,7 @@ import {
   Image,
   Switch,
   Picker,
+  ToastAndroid,
   TextInput,
   Dimensions,
 } from 'react-native';
@@ -14,6 +15,7 @@ import _ from 'lodash';
 import days from 'dayjs';
 import { Actions } from 'react-native-router-flux';
 
+import { Request, getLoginInfo } from '../../api/index';
 import Flex from '../../components/common/Flex';
 import Button from '../../components/common/Button';
 import List from '../../components/common/List';
@@ -30,15 +32,87 @@ export default class DrawsDetail extends Component {
       desc,
       sort,
       createdAt,
+      sortList: [],
     };
   }
 
-  handleSubmit = () => {
-    Actions.pop();
+  componentDidMount() {
+    this.handleGetSort();
   }
 
+  handleGetSort = () => {
+    Request('query', `getSort { list { value text } }`).then(json => {
+      this.setState({
+        sortList: _.concat(
+          { text: '未分类', value: null },
+          json.data.getSort.list,
+        ),
+      });
+    });
+  };
+
+  handleSubmit = () => {
+    const { publish, title, desc, sort } = this.state;
+    const { _id } = this.props;
+    const arr = [title, desc, sort];
+    if (!sort) {
+      ToastAndroid.showWithGravity(
+        '请设置分类',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+      return null;
+    }
+    if (publish && !_.every(arr, Boolean)) {
+      ToastAndroid.showWithGravity(
+        '发布需要完善作品信息！',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+      return null;
+    }
+    getLoginInfo().then(res => {
+      Request(
+        'mutation',
+        `editDraws(
+          phone: "${res.phone}",
+          token: "${res.token}",
+          id: "${_id}",
+          title: "${title || ''}",
+          desc: "${desc || ''}",
+          sort: "${sort}",
+          publish: ${publish ? 1 : 0}
+        ) {
+            mes
+            code
+        }`,
+      ).then(json => {
+        const { code, mes } = json.data.editDraws;
+        ToastAndroid.showWithGravity(
+          mes,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        if (code === 1) {
+          Actions.reset('tabBar');
+          return null;
+        } else {
+          Actions.pop();
+        }
+      });
+    });
+  };
+
   render() {
-    const { publish, createdAt, author, sort, title, desc } = this.state;
+    const {
+      publish,
+      createdAt,
+      author,
+      sort,
+      title,
+      desc,
+      sortList,
+    } = this.state;
 
     return (
       <View style={styles.content}>
@@ -64,11 +138,16 @@ export default class DrawsDetail extends Component {
         <View style={styles.inputItem}>
           <Text style={styles.label}>分类：</Text>
           <Picker
-            selectedValue={this.state.language}
+            selectedValue={sort}
             style={styles.input}
             onValueChange={itemValue => this.setState({ sort: itemValue })}>
-            <Picker.Item label="Java" value="java" />
-            <Picker.Item label="JavaScript" value="js" />
+            {_.map(sortList, item => (
+              <Picker.Item
+                key={item.value}
+                label={item.text}
+                value={item.value}
+              />
+            ))}
           </Picker>
         </View>
         <View style={styles.inputItem}>
@@ -76,7 +155,7 @@ export default class DrawsDetail extends Component {
           <TextInput
             style={styles.input}
             placeholder="请输入"
-            onChangeText={v => this.setState({ title: v })}
+            onChangeText={v => this.setState({ desc: v })}
             value={desc}
           />
         </View>

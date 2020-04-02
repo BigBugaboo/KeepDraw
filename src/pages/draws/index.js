@@ -3,7 +3,7 @@ import {
   Text,
   View,
   StyleSheet,
-  TouchableHighlight,
+  Alert,
   Image,
   ToastAndroid,
   Dimensions,
@@ -26,7 +26,7 @@ export default class Draws extends Component {
       uri: '',
       list: [],
       loading: true,
-      more: true,
+      more: false,
       offset: 0,
     };
   }
@@ -56,6 +56,7 @@ export default class Draws extends Component {
             src
             author
             desc
+            sort
             publish
             comments
             updatedAt
@@ -69,8 +70,11 @@ export default class Draws extends Component {
           _.forEach(list, (item, index) => {
             this.handleDown(index, item.src);
           });
+          const arr =
+            this.state.offset === 0 ? list : _.concat(list, this.state.list);
           this.setState({
-            list: _.concat(list, this.state.list),
+            list: arr,
+            offset: more ? this.state.offset + 1 : this.state.offset,
             more,
           });
         })
@@ -86,6 +90,39 @@ export default class Draws extends Component {
         this.handleUpdateImage(res.uri);
       }
     }, 0);
+  };
+
+  handleRemove = id => {
+    Alert.alert(
+      '警告',
+      '确认删除吗？',
+      [
+        {
+          text: '取消',
+          style: 'cancel',
+        },
+        {
+          text: '确认',
+          onPress: () => {
+            Request('mutation', `removeDraws(id: "${id}") { mes }`).then(
+              json => {
+                ToastAndroid.showWithGravity(
+                  json.data.removeDraws.mes,
+                  ToastAndroid.SHORT,
+                  ToastAndroid.CENTER,
+                );
+                this.setState({
+                  list: _.remove(this.state.list, i => {
+                    return i._id !== id;
+                  }),
+                });
+              },
+            );
+          },
+        },
+      ],
+      { cancelable: false },
+    );
   };
 
   handleUpdateImage = src => {
@@ -110,6 +147,15 @@ export default class Draws extends Component {
         if (code === 1) {
           Actions.reset('tabBar');
         }
+
+        this.setState(
+          pre => ({
+            offset: 0,
+          }),
+          () => {
+            this.handleGetDraws();
+          },
+        );
       });
     });
   };
@@ -144,7 +190,7 @@ export default class Draws extends Component {
       banner,
       info,
     } = styles;
-    const { loading, list } = this.state;
+    const { loading, list, more } = this.state;
 
     return (
       <>
@@ -153,9 +199,13 @@ export default class Draws extends Component {
           style={content}
           ListFooterComponent={
             <Flex justifyCenter>
-              <Button style={{ width: '20%' }} type="white">
-                加载更多
-              </Button>
+              {list.length > 0 && more ? (
+                <Button style={{ width: '20%' }} type="white">
+                  加载更多
+                </Button>
+              ) : (
+                <Text>已经到底了</Text>
+              )}
             </Flex>
           }
           data={_.map(list, (item, index) => ({
@@ -168,9 +218,7 @@ export default class Draws extends Component {
                       <Text style={name}>{item.title || '未设置标题'}</Text>
                       <Text>作者：{item.author}</Text>
                       <Text style={date}>
-                        {days(_.toNumber(item.createdAt)).format(
-                          'YYYY-MM-DD HH:mm',
-                        )}
+                        {days(_.toNumber(item.createdAt)).format('YYYY-MM-DD')}
                       </Text>
                     </View>
                     <Flex column>
@@ -181,7 +229,11 @@ export default class Draws extends Component {
                     </Flex>
                   </View>
                   <View style={banner}>
-                    <Button type="danger">删除</Button>
+                    <Button
+                      type="danger"
+                      onPress={() => this.handleRemove(item._id)}>
+                      删除
+                    </Button>
                     <Button
                       type="deafult"
                       onPress={this.handleDetail.bind(this, item)}>
