@@ -3,8 +3,6 @@ import {
   Text,
   View,
   StyleSheet,
-  TouchableHighlight,
-  Image,
   Switch,
   Picker,
   ToastAndroid,
@@ -18,7 +16,6 @@ import { Actions } from 'react-native-router-flux';
 import { Request, getLoginInfo } from '../../api/index';
 import Flex from '../../components/common/Flex';
 import Button from '../../components/common/Button';
-import List from '../../components/common/List';
 
 export default class DrawsDetail extends Component {
   constructor(props) {

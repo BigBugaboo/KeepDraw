@@ -15,52 +15,38 @@ import {
 import { Actions } from 'react-native-router-flux';
 
 import Flex from '../../components/common/Flex';
+import { Request } from '../../api/index';
 import Button from '../../components/common/Button';
 import List from '../../components/common/List';
 import _ from 'lodash';
 
-const arr = [
-  {
-    id: 0,
-    title: '标题1',
-  },
-  {
-    id: 1,
-    title: '标题2',
-  },
-  {
-    id: 2,
-    title: '标题3',
-  },
-  {
-    id: 3,
-    title: '标题4',
-  },
-  {
-    id: 4,
-    title: '标题5',
-  },
-  {
-    id: 5,
-    title: '标题6',
-  },
-  {
-    id: 6,
-    title: '标题7',
-  },
-];
-
 export default class Sort extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      sort: null,
+      sortList: [],
+    };
   }
+
+  componentDidMount() {
+    this.handleGetSort();
+  }
+
+  handleGetSort = () => {
+    Request('query', `getSort { list { value text } }`).then(json => {
+      this.setState({
+        sortList: json.data.getSort.list,
+      });
+    });
+  };
 
   render() {
     return (
-      <Flex style={styles.container} wrap justifyBetween>
-        {_.map(arr, (item, index) => (
-          <TouchableOpacity style={styles.item} key={item.id}>
-            <Text style={styles.itemText}>{item.title}</Text>
+      <Flex style={styles.container} wrap>
+        {_.map(this.state.sortList, (item, index) => (
+          <TouchableOpacity style={styles.item} key={item.value}>
+            <Text style={styles.itemText}>{item.text}</Text>
           </TouchableOpacity>
         ))}
       </Flex>
@@ -68,14 +54,15 @@ export default class Sort extends Component {
   }
 }
 
-const { width, height } = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     width: '100%',
   },
   item: {
+    width: '40%',
     padding: 10,
-    marginBottom: 10,
+    marginVertical: 10,
+    marginHorizontal: '5%',
     backgroundColor: '#fff',
     borderBottomColor: '#39f',
     borderBottomWidth: 4,
@@ -83,5 +70,5 @@ const styles = StyleSheet.create({
   },
   itemText: {
     textAlign: 'center',
-  }
+  },
 });

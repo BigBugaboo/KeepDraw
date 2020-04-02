@@ -57,7 +57,7 @@ export default [
     option: {
       title: '登录',
       key: 'login',
-      // initial: true,
+      initial: true,
       hideNavBar: true,
       component: Login,
     },
@@ -76,7 +76,6 @@ export default [
     option: {
       title: '画册',
       key: 'draws',
-      initial: true,
       hideNavBar: true,
       component: Draws,
     },
