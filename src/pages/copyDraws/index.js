@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import {
   Text,
   View,
+  ToastAndroid,
   StyleSheet,
-  TouchableHighlight,
+  Switch,
+  Alert,
   Image,
   Dimensions,
 } from 'react-native';
@@ -14,76 +16,121 @@ import { Actions } from 'react-native-router-flux';
 
 import Flex from '../../components/common/Flex';
 import Button from '../../components/common/Button';
+import Loading from '../../components/common/Loading';
 import List from '../../components/common/List';
-import { uploadImage, downloadImage } from '../../utils';
-
-const selectImage = {
-  title: '图片上传',
-  cancelButtonTitle: '取消',
-  takePhotoButtonTitle: '拍照上传',
-  chooseFromLibraryButtonTitle: '选择图片上传',
-  mediaType: 'photo',
-  quality: 1,
-  noData: true,
-  storageOptions: {
-    skipBackup: true,
-    path: 'images',
-  },
-  permissionDenied: {
-    title: '获取拍照权限',
-    text: '获取拍照权限，拍照后上传',
-    reTryTitle: '重试',
-    okTitle: '确认',
-  },
-};
+import { selectImage, downloadImage } from '../../utils';
+import { Request, getLoginInfo } from '../../api/index';
 
 export default class CopyDraws extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      uri: '',
+      offset: 0,
+      more: true,
+      loading: true,
+      list: [],
     };
   }
 
-  handelSelectImage = () => {
-    ImagePicker.showImagePicker(selectImage, response => {
-      console.log('Response = ', response);
+  componentDidMount() {
+    this.handleGetList();
+  }
 
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      } else {
-        const source = { uri: response.uri };
-
-        // You can also display the image using data:
-        // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-        // this.setState({
-        //   avatarSource: source,
-        // });
-        console.log('上传图片');
-        uploadImage('image/test/3.jpeg', response.uri)
-          .then(res => {
-            console.log('1', res);
-          })
-          .catch(e => {
-            console.log(e);
+  handleGetList = () => {
+    this.setState({ loading: true });
+    getLoginInfo().then(res => {
+      Request(
+        'query',
+        `getCopyDraws(
+          offset: ${this.state.offset},
+          phone: "${res.phone}", 
+          token: "${res.token}", 
+        ) {
+          list {
+            _id
+            src
+            author
+            publish
+            updatedAt
+            createdAt
+            copys
+          }
+          more
+        }`,
+      )
+        .then(json => {
+          const { more, list } = json.data.getCopyDraws;
+          console.log(list);
+          _.forEach(list, (item, index) => {
+            this.handleDown(index, item.src);
           });
-      }
+          const arr =
+            this.state.offset === 0 ? list : _.concat(list, this.state.list);
+          this.setState({
+            list: arr,
+            offset: more ? this.state.offset + 1 : this.state.offset,
+            more,
+          });
+        })
+        .finally(() => {
+          this.setState({ loading: false });
+        });
     });
   };
 
-  handleDown = () => {
-    downloadImage('image/test/2.jpeg')
+  handleDown = (index, src) => {
+    downloadImage(src)
       .then(res => {
-        console.log('1', res);
-        this.setState({ uri: res });
+        const list = _.cloneDeep(this.state.list);
+        list[index].src = res;
+        this.setState({ list });
       })
       .catch(e => {
         console.log(e);
       });
+  };
+
+  handleUpdateLoad = () => {
+    selectImage(res => {
+      if (res) {
+        this.handleUpdateImage(res.uri);
+      }
+    }, 0);
+  };
+
+  handleUpdateImage = src => {
+    getLoginInfo().then(res => {
+      Request(
+        'mutation',
+        `addCopyDraws(
+            phone: "${res.phone}", 
+            token: "${res.token}", 
+            src: "${src}"
+          ) {
+            mes
+            code
+          }`,
+      ).then(json => {
+        const { code, mes } = json.data.addCopyDraws;
+        ToastAndroid.showWithGravity(
+          mes,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        if (code === 1) {
+          Actions.reset('tabBar');
+        }
+
+        this.setState(
+          pre => ({
+            offset: 0,
+          }),
+          () => {
+            this.handleGetList();
+          },
+        );
+      });
+    });
   };
 
   handleDetail = () => {
@@ -92,78 +139,162 @@ export default class CopyDraws extends Component {
     });
   };
 
+  handleDelete = id => {
+    Alert.alert(
+      '提示',
+      '确认删除吗？',
+      [
+        {
+          text: '取消',
+          style: 'cancel',
+        },
+        {
+          text: '确认',
+          onPress: () => {
+            this.setState({ loading: true });
+            getLoginInfo().then(res => {
+              Request(
+                'mutation',
+                `removeCopyDraws(
+                    phone: "${res.phone}", 
+                    token: "${res.token}", 
+                    id: "${id}",
+                  ) {
+                    mes
+                    code
+                  }`,
+              ).then(json => {
+                const { code, mes } = json.data.removeCopyDraws;
+                ToastAndroid.showWithGravity(
+                  mes,
+                  ToastAndroid.SHORT,
+                  ToastAndroid.CENTER,
+                );
+                if (code === 1) {
+                  Actions.reset('tabBar');
+                }
+                let new_list = _.remove(this.state.list, i => i._id !== id);
+                this.setState({
+                  list: new_list,
+                  loading: false,
+                });
+              });
+            });
+          },
+        },
+      ],
+      { cancelable: false },
+    );
+  };
+
+  handleChangePublish = (index, value, id) => {
+    Alert.alert(
+      '提示',
+      `${value ? '确认发布' : '取消发布'}吗？`,
+      [
+        {
+          text: '取消',
+          style: 'cancel',
+        },
+        {
+          text: '确认',
+          onPress: () => {
+            this.setState({ loading: true });
+            getLoginInfo().then(res => {
+              Request(
+                'mutation',
+                `editCopyDraws(
+                    phone: "${res.phone}", 
+                    token: "${res.token}", 
+                    id: "${id}",
+                    publish: ${value ? 1 : 0}
+                  ) {
+                    mes
+                    code
+                  }`,
+              ).then(json => {
+                const { code, mes } = json.data.editCopyDraws;
+                ToastAndroid.showWithGravity(
+                  mes,
+                  ToastAndroid.SHORT,
+                  ToastAndroid.CENTER,
+                );
+                if (code === 1) {
+                  Actions.reset('tabBar');
+                }
+                let new_list = _.cloneDeep(this.state.list);
+                new_list[index].publish = value;
+                this.setState({
+                  list: new_list,
+                  loading: false,
+                });
+              });
+            });
+          },
+        },
+      ],
+      { cancelable: false },
+    );
+  };
+
   render() {
-    const arr = [
-      {
-        img:
-          'http://b-ssl.duitang.com/uploads/item/201704/10/20170410095843_SEvMy.thumb.700_0.jpeg',
-        date: new Date(),
-        name: '名称',
-        desc:
-          '1827358712t38111111111111111111112222222222222222222222222222222222222222222222222211111111111111111111111111111111112g',
-        good: 16,
-        bad: 20,
-      },
-      {
-        img: this.state.uri,
-        date: new Date(),
-        name: '名称',
-        desc: '1827358712t3812g',
-        good: 16,
-        bad: 20,
-      },
-    ];
-    const {
-      content,
-      box,
-      img,
-      infomation,
-      name,
-      date,
-      desc,
-      banner,
-      info,
-    } = styles;
+    const { loading, list } = this.state;
+    const { content, box, img, infomation, date, banner, info, tip } = styles;
 
     return (
       <>
+        <Loading show={loading} />
         <List
           style={content}
-          data={_.map(arr, (item, index) => ({
+          data={_.map(list, (item, index) => ({
             Content: () => (
               <View style={box}>
-                <Image style={img} source={{ uri: item.img }} />
+                <Image style={img} source={{ uri: item.src }} />
                 <View style={infomation}>
                   <View style={info}>
                     <View>
-                      <Text style={name}>{item.name}</Text>
                       <Text style={date}>
-                        {days(item.date).format('YYYY-MM-DD HH:mm')}
+                        {days(_.toNumber(item.createdAt)).format(
+                          'YYYY-MM-DD HH:mm:ss',
+                        )}
                       </Text>
                     </View>
-                    <Flex column>
-                      <Text>描述</Text>
-                      <Text numberOfLines={4} style={desc}>
-                        {item.desc}
-                      </Text>
+                    <Text numberOfLines={1}>作者：{item.author}</Text>
+                    <Flex alignCenter>
+                      <Text>发布：{item.publish ? '已发布' : '未发布'}</Text>
+                      <Switch
+                        trackColor="#ffffff"
+                        thumbColor="#3399ff"
+                        testID={'publish'}
+                        onValueChange={() =>
+                          this.handleChangePublish(
+                            index,
+                            !item.publish,
+                            item._id,
+                          )
+                        }
+                        value={!!item.publish}
+                      />
                     </Flex>
+                    <Text style={tip}>发布后，其他用户可查看临摹画作</Text>
                   </View>
                   <View style={banner}>
-                    <Button type="danger">删除</Button>
-                    <Button type="deafult" onPress={this.handleDetail}>
-                      审批
+                    <Button
+                      type="danger"
+                      onPress={() => this.handleDelete(item._id)}>
+                      删除
+                    </Button>
+                    <Button type="primary" onPress={this.handleDetail}>
+                      评分
                     </Button>
                   </View>
                 </View>
               </View>
             ),
-            id: index,
+            id: item._id,
           }))}
         />
-        <Button type="primary" onPress={this.handleDown}>
-          下载
-        </Button>
-        <Button type="primary" onPress={this.handelSelectImage}>
+        <Button type="primary" onPress={this.handleUpdateLoad}>
           上传
         </Button>
       </>
@@ -205,16 +336,7 @@ const styles = StyleSheet.create({
   banner: {
     width: '20%',
   },
-  name: {
-    fontSize: 20,
-  },
-  date: {
-    color: '#3d3d3d',
-  },
-  desc: {
-    borderColor: '#3f3f3f',
-    borderStyle: 'dotted',
-    borderWidth: 1,
-    padding: 4,
+  tip: {
+    color: '#898989',
   },
 });

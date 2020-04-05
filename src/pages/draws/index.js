@@ -32,10 +32,6 @@ export default class Draws extends Component {
   }
 
   componentDidMount() {
-    // todo 获取个人画册
-    // getLoginInfo().then(res => {
-    //   this.handleGetInfo(res.phone, res.token);
-    // });
     this.handleGetDraws();
   }
 
@@ -104,6 +100,7 @@ export default class Draws extends Component {
         {
           text: '确认',
           onPress: () => {
+            this.setState({ loading: true });
             Request('mutation', `removeDraws(id: "${id}") { mes }`).then(
               json => {
                 ToastAndroid.showWithGravity(
@@ -115,6 +112,7 @@ export default class Draws extends Component {
                   list: _.remove(this.state.list, i => {
                     return i._id !== id;
                   }),
+                  loading: false,
                 });
               },
             );
@@ -218,7 +216,9 @@ export default class Draws extends Component {
                       <Text style={name}>{item.title || '未设置标题'}</Text>
                       <Text>作者：{item.author}</Text>
                       <Text style={date}>
-                        {days(_.toNumber(item.createdAt)).format('YYYY-MM-DD')}
+                        {days(_.toNumber(item.createdAt)).format(
+                          'YYYY-MM-DD HH:mm:ss',
+                        )}
                       </Text>
                     </View>
                     <Flex column>
