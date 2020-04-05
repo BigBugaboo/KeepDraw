@@ -91,11 +91,10 @@ export default class DrawsDetail extends Component {
           ToastAndroid.CENTER,
         );
         if (code === 1) {
-          Actions.reset('tabBar');
+          Actions.reset('login');
           return null;
         } else {
           Actions.pop({ refresh: { is_update: true } });
-          Actions.refresh('params')
         }
       });
     });

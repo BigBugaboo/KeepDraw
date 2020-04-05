@@ -16,47 +16,11 @@ import { Actions } from 'react-native-router-flux';
 
 import Flex from '../../components/common/Flex';
 import Button from '../../components/common/Button';
+import Loading from '../../components/common/Loading';
 import List from '../../components/common/List';
 import _ from 'lodash';
-
-const arr = [
-  {
-    id: 0,
-    title: '标题1',
-    author: '作者',
-    desc: '123123123123',
-    img:
-      'http://b-ssl.duitang.com/uploads/item/201704/10/20170410095843_SEvMy.thumb.700_0.jpeg',
-  },
-  {
-    id: 1,
-    title: '标题2',
-    author: '作者',
-    img:
-      'http://b-ssl.duitang.com/uploads/item/201704/10/20170410095843_SEvMy.thumb.700_0.jpeg',
-  },
-  {
-    id: 2,
-    title: '标题3',
-    author: '作者',
-    img:
-      'http://b-ssl.duitang.com/uploads/item/201704/10/20170410095843_SEvMy.thumb.700_0.jpeg',
-  },
-  {
-    id: 3,
-    title: '标题4',
-    author: '作者',
-    img:
-      'http://b-ssl.duitang.com/uploads/item/201704/10/20170410095843_SEvMy.thumb.700_0.jpeg',
-  },
-  {
-    id: 4,
-    title: '标题5',
-    author: '作者',
-    img:
-      'http://b-ssl.duitang.com/uploads/item/201704/10/20170410095843_SEvMy.thumb.700_0.jpeg',
-  },
-];
+import { selectImage, downloadImage } from '../../utils';
+import { Request, getLoginInfo } from '../../api/index';
 
 export default class Home extends Component {
   constructor(props) {
@@ -65,8 +29,75 @@ export default class Home extends Component {
       name: '',
       desc: '',
       id: null,
+      list: [],
+      loading: false,
+      offset: 0,
+      more: true,
+      error_index: [],
     };
   }
+
+  componentDidMount() {
+    this.handleGetList();
+  }
+
+  handleGetList = () => {
+    this.setState({ loading: true });
+    const sort = this.props.sort || '';
+    console.log(sort);
+    getLoginInfo().then(res => {
+      Request(
+        'query',
+        `getDraws(
+          offset: ${this.state.offset},
+          sort: "${sort}"
+        ) {
+          list {
+            _id
+            title
+            src
+            author
+            desc
+            sort
+            comments
+            updatedAt
+            createdAt
+          }
+          more
+        }`,
+      )
+        .then(json => {
+          const { more, list } = json.data.getDraws;
+          _.forEach(list, (item, index) => {
+            this.handleDown(index, item.src);
+          });
+          const arr =
+            this.state.offset === 0 ? list : _.concat(list, this.state.list);
+          this.setState({
+            list: arr,
+            offset: more ? this.state.offset + 1 : this.state.offset,
+            more: !!more,
+          });
+        })
+        .finally(() => {
+          this.setState({ loading: false });
+        });
+    });
+  };
+
+  handleDown = (index, src) => {
+    downloadImage(src)
+      .then(res => {
+        const list = _.cloneDeep(this.state.list);
+        list[index].src = res;
+        this.setState({ list });
+      })
+      .catch(e => {
+        this.setState({
+          error_index: _.concat(this.state.error_index, index),
+        });
+      });
+  };
 
   handelChangeState = data => {
     console.log(data);
@@ -92,21 +123,27 @@ export default class Home extends Component {
   };
 
   render() {
-    const { list } = styles;
-    const { name, desc, id } = this.state;
+    const { name, desc, id, list, loading, more, error_index } = this.state;
     return (
       <>
+        <Loading show={loading} />
         <List
           ListFooterComponent={
-            <Text style={{ textAlign: 'center', color: '#999', padding: 10 }}>
-              已经到底了~~
-            </Text>
+            <Flex justifyCenter>
+              {list.length > 0 && more ? (
+                <Button style={{ width: '20%' }} type="white">
+                  加载更多
+                </Button>
+              ) : (
+                <Text style={styles.empty}>已经到底了~~</Text>
+              )}
+            </Flex>
           }
-          style={list}
-          data={_.map(arr, (item, index) => ({
+          style={styles.list}
+          data={_.map(list, (item, index) => ({
             Content: props => (
               <Content
-                data={item}
+                data={{ ...item, index, error_index }}
                 onClick={() => this.handelChangeState(item)}
                 index={index}
                 {...props}
@@ -151,12 +188,28 @@ class Content extends Component {
     const { box, imgBox } = styles;
     const { width, height } = Dimensions.get('window');
     const { data } = this.props;
-    const { title, img } = data;
+    const { src, index, error_index } = data;
 
     return (
       <TouchableHighlight onPress={this.handlePress}>
         <View style={[box, { height: height - 80 }]}>
-          <Image resizeMode="contain" style={imgBox} source={{ uri: img }} />
+          {_.includes(error_index, index) ? (
+            <Button
+              onPress={() => {
+                this.setState(
+                  pre => ({
+                    offset: 0,
+                  }),
+                  () => {
+                    this.handleGetDraws();
+                  },
+                );
+              }}>
+              重新获取图片
+            </Button>
+          ) : (
+            <Image resizeMode="contain" style={imgBox} source={{ uri: src }} />
+          )}
         </View>
       </TouchableHighlight>
     );
@@ -168,6 +221,12 @@ const styles = StyleSheet.create({
   list: {
     width: '100%',
     backgroundColor: '#ddd',
+  },
+  empty: {
+    textAlign: 'center',
+    color: '#999',
+    padding: 10,
+    marginBottom: 100,
   },
   box: {
     width: '100%',

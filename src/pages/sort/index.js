@@ -16,8 +16,6 @@ import { Actions } from 'react-native-router-flux';
 
 import Flex from '../../components/common/Flex';
 import { Request } from '../../api/index';
-import Button from '../../components/common/Button';
-import List from '../../components/common/List';
 import _ from 'lodash';
 
 export default class Sort extends Component {
@@ -36,16 +34,23 @@ export default class Sort extends Component {
   handleGetSort = () => {
     Request('query', `getSort { list { value text } }`).then(json => {
       this.setState({
-        sortList: json.data.getSort.list,
+        sortList: _.concat({ text: '全部', value: '' }, json.data.getSort.list),
       });
     });
+  };
+
+  handleSelected = key => {
+    Actions.reset('tabBar', { sort: key });
   };
 
   render() {
     return (
       <Flex style={styles.container} wrap>
         {_.map(this.state.sortList, (item, index) => (
-          <TouchableOpacity style={styles.item} key={item.value}>
+          <TouchableOpacity
+            style={styles.item}
+            key={item.value}
+            onPress={() => this.handleSelected(item.value)}>
             <Text style={styles.itemText}>{item.text}</Text>
           </TouchableOpacity>
         ))}

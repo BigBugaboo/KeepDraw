@@ -68,7 +68,7 @@ export default class MineInfo extends React.Component {
           ToastAndroid.SHORT,
           ToastAndroid.CENTER,
         );
-        Actions.reset('tabBar');
+        Actions.reset('login');
       }
       this.setState({
         name,
@@ -117,7 +117,7 @@ export default class MineInfo extends React.Component {
           ToastAndroid.CENTER,
         );
         if (code === 1) {
-          Actions.reset('tabBar');
+          Actions.reset('login');
         }
       });
     });

@@ -29,6 +29,7 @@ export default class CopyDraws extends Component {
       more: true,
       loading: true,
       list: [],
+      error_index: [],
     };
   }
 
@@ -69,7 +70,7 @@ export default class CopyDraws extends Component {
           this.setState({
             list: arr,
             offset: more ? this.state.offset + 1 : this.state.offset,
-            more,
+            more: !!more,
           });
         })
         .finally(() => {
@@ -86,7 +87,9 @@ export default class CopyDraws extends Component {
         this.setState({ list });
       })
       .catch(e => {
-        console.log(e);
+        this.setState({
+          error_index: _.concat(this.state.error_index, index),
+        });
       });
   };
 
@@ -118,7 +121,7 @@ export default class CopyDraws extends Component {
           ToastAndroid.CENTER,
         );
         if (code === 1) {
-          Actions.reset('tabBar');
+          Actions.reset('login');
         }
 
         this.setState(
@@ -171,7 +174,7 @@ export default class CopyDraws extends Component {
                   ToastAndroid.CENTER,
                 );
                 if (code === 1) {
-                  Actions.reset('tabBar');
+                  Actions.reset('login');
                 }
                 let new_list = _.remove(this.state.list, i => i._id !== id);
                 this.setState({
@@ -220,7 +223,7 @@ export default class CopyDraws extends Component {
                   ToastAndroid.CENTER,
                 );
                 if (code === 1) {
-                  Actions.reset('tabBar');
+                  Actions.reset('login');
                 }
                 let new_list = _.cloneDeep(this.state.list);
                 new_list[index].publish = value;
@@ -238,7 +241,7 @@ export default class CopyDraws extends Component {
   };
 
   render() {
-    const { loading, list } = this.state;
+    const { loading, list, more, error_index } = this.state;
     const { content, box, img, infomation, date, banner, info, tip } = styles;
 
     return (
@@ -246,10 +249,37 @@ export default class CopyDraws extends Component {
         <Loading show={loading} />
         <List
           style={content}
+          ListFooterComponent={
+            <Flex justifyCenter>
+              {list.length > 0 && more ? (
+                <Button style={{ width: '20%' }} type="white">
+                  加载更多
+                </Button>
+              ) : (
+                <Text>已经到底了</Text>
+              )}
+            </Flex>
+          }
           data={_.map(list, (item, index) => ({
             Content: () => (
               <View style={box}>
-                <Image style={img} source={{ uri: item.src }} />
+                {_.includes(error_index, index) ? (
+                  <Button
+                    onPress={() => {
+                      this.setState(
+                        pre => ({
+                          offset: 0,
+                        }),
+                        () => {
+                          this.handleGetDraws();
+                        },
+                      );
+                    }}>
+                    重新获取图片
+                  </Button>
+                ) : (
+                  <Image style={img} source={{ uri: item.src }} />
+                )}
                 <View style={infomation}>
                   <View style={info}>
                     <View>

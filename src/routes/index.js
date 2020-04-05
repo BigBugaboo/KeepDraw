@@ -57,7 +57,7 @@ export default [
     option: {
       title: '登录',
       key: 'login',
-      // initial: true,
+      initial: true,
       hideNavBar: true,
       component: Login,
     },

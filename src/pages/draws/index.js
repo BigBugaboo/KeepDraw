@@ -84,7 +84,7 @@ export default class Draws extends Component {
           this.setState({
             list: arr,
             offset: more ? this.state.offset + 1 : this.state.offset,
-            more,
+            more: !!more,
           });
         })
         .finally(() => {
@@ -162,7 +162,7 @@ export default class Draws extends Component {
           ToastAndroid.CENTER,
         );
         if (code === 1) {
-          Actions.reset('tabBar');
+          Actions.reset('login');
         }
 
         this.setState(
@@ -231,7 +231,19 @@ export default class Draws extends Component {
             Content: () => (
               <View style={box}>
                 {_.includes(error_index, index) ? (
-                  <Text>失败了</Text>
+                  <Button
+                    onPress={() => {
+                      this.setState(
+                        pre => ({
+                          offset: 0,
+                        }),
+                        () => {
+                          this.handleGetDraws();
+                        },
+                      );
+                    }}>
+                    重新获取图片
+                  </Button>
                 ) : (
                   <Image style={img} source={{ uri: item.src }} />
                 )}
