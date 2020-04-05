@@ -94,7 +94,8 @@ export default class DrawsDetail extends Component {
           Actions.reset('tabBar');
           return null;
         } else {
-          Actions.pop();
+          Actions.pop({ refresh: { is_update: true } });
+          Actions.refresh('params')
         }
       });
     });

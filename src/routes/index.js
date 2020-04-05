@@ -75,7 +75,6 @@ export default [
     type: 'scene',
     option: {
       title: '画册',
-      initial: true,
       key: 'draws',
       hideNavBar: true,
       component: Draws,

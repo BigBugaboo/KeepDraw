@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Text, TouchableOpacity, StyleSheet } from 'react-native';
 
+import { debounce } from '../../utils';
+
 // 按钮组件
 export default class Button extends Component {
   constructor(props) {
@@ -14,7 +16,7 @@ export default class Button extends Component {
     return (
       <TouchableOpacity
         style={[mineStyles.btn, mineStyles[type], style, mineStyles[shape]]}
-        onPress={onPress}>
+        onPress={debounce(onPress, 1000)}>
         <Text style={[{ textAlign: 'center' }, mineStyles[type], textStyle]}>
           {children}
         </Text>

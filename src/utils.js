@@ -46,7 +46,7 @@ export const throttle = (func, duration = 1000, type = 1) => {
  * @param {bool} immediate 是否立即执行
  */
 
-export const debounce = (func, wait = 1000, immediate = false) => {
+export const debounce = (func, wait = 1000, immediate = true) => {
   let timeout;
 
   return function() {

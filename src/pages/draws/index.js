@@ -28,6 +28,7 @@ export default class Draws extends Component {
       loading: true,
       more: false,
       offset: 0,
+      error_index: [],
     };
   }
 
@@ -35,14 +36,26 @@ export default class Draws extends Component {
     this.handleGetDraws();
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.is_update) {
+      this.setState(
+        pre => ({
+          offset: 0,
+        }),
+        () => {
+          this.handleGetDraws();
+        },
+      );
+    }
+  }
+
   handleGetDraws = async () => {
     this.setState({ loading: true });
     getLoginInfo().then(res => {
       Request(
         'query',
-        `getDraws(
+        `getPersonDraws(
           offset: ${this.state.offset},
-          sort: "",
           phone: "${res.phone}", 
           token: "${res.token}", 
         ) {
@@ -62,7 +75,7 @@ export default class Draws extends Component {
         }`,
       )
         .then(json => {
-          const { more, list } = json.data.getDraws;
+          const { more, list } = json.data.getPersonDraws;
           _.forEach(list, (item, index) => {
             this.handleDown(index, item.src);
           });
@@ -101,8 +114,14 @@ export default class Draws extends Component {
           text: '确认',
           onPress: () => {
             this.setState({ loading: true });
-            Request('mutation', `removeDraws(id: "${id}") { mes }`).then(
-              json => {
+            getLoginInfo().then(res => {
+              Request(
+                'mutation',
+                `removeDraws(
+                  phone: "${res.phone}",
+                  token: "${res.token}", 
+                  id: "${id}") { mes }`,
+              ).then(json => {
                 ToastAndroid.showWithGravity(
                   json.data.removeDraws.mes,
                   ToastAndroid.SHORT,
@@ -114,8 +133,8 @@ export default class Draws extends Component {
                   }),
                   loading: false,
                 });
-              },
-            );
+              });
+            });
           },
         },
       ],
@@ -166,7 +185,9 @@ export default class Draws extends Component {
         this.setState({ list });
       })
       .catch(e => {
-        console.log(e);
+        this.setState({
+          error_index: _.concat(this.state.error_index, index),
+        });
       });
   };
 
@@ -188,7 +209,7 @@ export default class Draws extends Component {
       banner,
       info,
     } = styles;
-    const { loading, list, more } = this.state;
+    const { loading, list, more, error_index } = this.state;
 
     return (
       <>
@@ -209,7 +230,11 @@ export default class Draws extends Component {
           data={_.map(list, (item, index) => ({
             Content: () => (
               <View style={box}>
-                <Image style={img} source={{ uri: item.src }} />
+                {_.includes(error_index, index) ? (
+                  <Text>失败了</Text>
+                ) : (
+                  <Image style={img} source={{ uri: item.src }} />
+                )}
                 <View style={infomation}>
                   <View style={info}>
                     <View>
