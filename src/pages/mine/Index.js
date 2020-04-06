@@ -19,9 +19,9 @@ const menuList = [
     path: 'draws',
   },
   {
-    key: 'copyDraws',
+    key: 'collect',
     title: '收藏集',
-    path: 'copyDraws',
+    path: 'collect',
   },
   {
     key: 'logout',

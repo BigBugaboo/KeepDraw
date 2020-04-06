@@ -3,22 +3,17 @@ import {
   Text,
   View,
   StyleSheet,
-  TouchableHighlight,
   TouchableOpacity,
-  FlatList,
-  PanResponder,
   ScrollView,
   Image,
-  ToastAndroid,
-  TouchableWithoutFeedback,
+  Modal,
   Dimensions,
 } from 'react-native';
 import { Actions } from 'react-native-router-flux';
+import ImageViewer from 'react-native-image-zoom-viewer';
 import days from 'dayjs';
 
 import Flex from '../../components/common/Flex';
-import Button from '../../components/common/Button';
-import Loading from '../../components/common/Loading';
 import List from '../../components/common/List';
 import _ from 'lodash';
 import { selectImage, downloadImage } from '../../utils';
@@ -31,6 +26,7 @@ export default class Detail extends Component {
     this.state = {
       showAvatar: true,
       sort: '',
+      modal_visible: false,
     };
   }
 
@@ -64,17 +60,30 @@ export default class Detail extends Component {
 
   render() {
     const { author, title, comments, createdAt, desc, src } = this.props;
-    const { showAvatar, sort } = this.state;
+    const { showAvatar, sort, modal_visible } = this.state;
     return (
       <View style={styles.container}>
+        <Modal
+          visible={modal_visible}
+          transparent={true}
+          onRequestClose={() => {
+            this.setState({ modal_visible: false });
+          }}>
+          <ImageViewer imageUrls={[{ url: src }]} />
+        </Modal>
         <ScrollView>
-          <Image
-            style={styles.draws}
-            resizeMode="contain"
-            source={{
-              uri: src,
-            }}
-          />
+          <TouchableOpacity
+            onPress={() => {
+              this.setState({ modal_visible: true });
+            }}>
+            <Image
+              style={styles.draws}
+              resizeMode="contain"
+              source={{
+                uri: src,
+              }}
+            />
+          </TouchableOpacity>
           <View style={styles.content}>
             <Text>标题：{title}</Text>
             <Text>作者：{author}</Text>

@@ -8,8 +8,9 @@ import {
   Alert,
   Image,
   Dimensions,
+  Modal,
 } from 'react-native';
-import ImagePicker from 'react-native-image-picker';
+import ImageViewer from 'react-native-image-zoom-viewer';
 import _ from 'lodash';
 import days from 'dayjs';
 import { Actions } from 'react-native-router-flux';
@@ -29,6 +30,7 @@ export default class CopyDraws extends Component {
       more: true,
       loading: true,
       list: [],
+      modal_visible: false,
     };
   }
 
@@ -247,8 +249,10 @@ export default class CopyDraws extends Component {
     );
   };
 
+  handleShowImage = () => {};
+
   render() {
-    const { loading, list, more } = this.state;
+    const { loading, list, more, modal_visible } = this.state;
     const { id } = this.props;
     const { content, box, img, infomation, date, banner, info, tip } = styles;
 
@@ -271,6 +275,14 @@ export default class CopyDraws extends Component {
           data={_.map(list, (item, index) => ({
             Content: () => (
               <View style={box}>
+                <Modal
+                  visible={modal_visible}
+                  transparent={true}
+                  onRequestClose={() => {
+                    this.setState({ modal_visible: false });
+                  }}>
+                  <ImageViewer imageUrls={[{ url: item.src }]} />
+                </Modal>
                 <Image style={img} source={{ uri: item.src }} />
                 <View style={infomation}>
                   <View style={info}>
@@ -282,6 +294,7 @@ export default class CopyDraws extends Component {
                       </Text>
                     </View>
                     <Text numberOfLines={1}>作者：{item.author}</Text>
+                    <Text numberOfLines={1}>临摹热度：{item.copys.length}</Text>
                     {id ? null : (
                       <Flex alignCenter>
                         <Text>发布：{item.publish ? '已发布' : '未发布'}</Text>
@@ -306,36 +319,40 @@ export default class CopyDraws extends Component {
                         : '发布后，其他用户可查看临摹画作'}
                     </Text>
                   </View>
-                  {id ? (
-                    <View style={banner}>
-                      <Button
-                        type="default"
-                        onPress={() => this.handleDelete(item._id)}>
-                        查看
-                      </Button>
-                      <Button
-                        type="primary"
-                        onPress={() => this.handleDelete(item._id)}>
-                        上传
-                      </Button>
-                      <Button
-                        type="default"
-                        onPress={() => this.handleDelete(item._id)}>
-                        收藏
-                      </Button>
-                    </View>
-                  ) : (
-                    <View style={banner}>
-                      <Button
-                        type="danger"
-                        onPress={() => this.handleDelete(item._id)}>
-                        删除
-                      </Button>
-                      <Button type="primary" onPress={this.handleDetail}>
-                        评分
-                      </Button>
-                    </View>
-                  )}
+                  <View style={banner}>
+                    <Button
+                      type="default"
+                      onPress={() => {
+                        this.setState({ modal_visible: true });
+                      }}>
+                      查看
+                    </Button>
+                    {id ? (
+                      <>
+                        <Button
+                          type="primary"
+                          onPress={() => this.handleDelete(item._id)}>
+                          上传
+                        </Button>
+                        <Button
+                          type="default"
+                          onPress={() => this.handleDelete(item._id)}>
+                          收藏
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          type="danger"
+                          onPress={() => this.handleDelete(item._id)}>
+                          删除
+                        </Button>
+                        <Button type="primary" onPress={this.handleDetail}>
+                          评分
+                        </Button>
+                      </>
+                    )}
+                  </View>
                 </View>
               </View>
             ),

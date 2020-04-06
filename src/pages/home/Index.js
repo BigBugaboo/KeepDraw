@@ -67,7 +67,6 @@ export default class Home extends Component {
       )
         .then(json => {
           const { more, list } = json.data.getDraws;
-          console.log(list);
           _.forEach(list, (item, index) => {
             this.handleDown(index, item.src);
           });
@@ -125,7 +124,6 @@ export default class Home extends Component {
 
   handleDetail = () => {
     const data = _.find(this.state.list, i => i._id === this.state.id);
-    console.log(data);
     if (this.state.id !== null) {
       Actions.push('homeDetail', {
         id: this.state.id,

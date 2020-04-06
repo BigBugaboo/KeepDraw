@@ -4,6 +4,7 @@ import Home from '../pages/home/index';
 import HomeDetail from '../pages/home/detail';
 import Mine from '../pages/mine/index';
 import MineInfo from '../pages/mine/info';
+import Collect from '../pages/mine/collect';
 import Login from '../pages/login/index';
 import Draws from '../pages/draws/index';
 import DrawsDetail from '../pages/draws/detail';
@@ -49,6 +50,15 @@ export default [
       title: '个人信息',
       key: 'mine',
       component: Mine,
+      rightTitle: ' ',
+    },
+  },
+  {
+    type: 'scene',
+    option: {
+      title: '收藏集',
+      key: 'collect',
+      component: Collect,
       rightTitle: ' ',
     },
   },
