@@ -5,39 +5,119 @@ import {
   TouchableOpacity,
   TextInput,
   Dimensions,
+  ToastAndroid,
   View,
 } from 'react-native';
 import { Actions } from 'react-native-router-flux';
+import _ from 'lodash';
+import days from 'dayjs';
 
 import Flex from '../../components/common/Flex';
 import Button from '../../components/common/Button';
 import List from '../../components/common/List';
-import _ from 'lodash';
-import days from 'dayjs';
+import { selectImage, downloadImage } from '../../utils';
+import { Request, getLoginInfo } from '../../api/index';
 
-const arr = [
-  {
-    id: 0,
-    author: '作者',
-    date: new Date(),
-    content:
-      '12312312111111111111111111111111111111111111111111111111111111111111111111111111111111111112',
-  },
-  {
-    id: 1,
-    author: '作者',
-    date: new Date(),
-    content:
-      '12312312111111111111111111111111111111111111111111111111111111111111111111111111111111111112',
-  },
-];
-
-export default class Home extends Component {
+export default class Comments extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      list: [],
+      more: true,
+      offset: 0,
+      content: '',
+    };
   }
 
+  componentDidMount() {
+    this.handleGetList();
+  }
+
+  handleGetList = () => {
+    const { offset } = this.state;
+    const { id } = this.props;
+    Request(
+      'query',
+      `
+        getComments(offset: ${offset}, id: "${id}") {
+          list {
+            author
+            content
+            createdAt
+          }
+          more
+        }
+      `,
+    ).then(json => {
+      const { more, list } = json.data.getComments;
+      this.setState({
+        list: list,
+        more: !!more,
+      });
+    });
+  };
+
+  handleSubmit = () => {
+    if (!this.state.content) {
+      ToastAndroid.showWithGravity(
+        '请输入点评内容',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+      return null;
+    }
+
+    this.handleSendComments();
+  };
+
+  handleSendComments = () => {
+    const { id } = this.props;
+    const { content } = this.state;
+    getLoginInfo().then(res => {
+      Request(
+        'mutation',
+        `
+        addComments(
+        phone: "${res.phone}", 
+        token:"${res.token}", 
+        id: "${id}", 
+        content: "${content}") {
+          mes
+          code
+        }
+      `,
+      ).then(json => {
+        const { mes, code } = json.data.addComments;
+        ToastAndroid.showWithGravity(
+          mes,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        if (code === 1) {
+          Actions.reset('login');
+        }
+
+        this.setState(
+          pre => ({
+            offset: 0,
+            content: '',
+          }),
+          () => {
+            this.handleGetList();
+          },
+        );
+      });
+    });
+  };
+
+  handleChangeComments = val => {
+    this.setState({
+      content: val,
+    });
+  };
+
   render() {
+    const { more, list, content } = this.state;
     return (
       <>
         <List
@@ -47,20 +127,24 @@ export default class Home extends Component {
             </Text>
           }
           style={styles.list}
-          data={_.map(arr, (item, index) => ({
+          data={_.map(list, (item, index) => ({
             Content: props => <Content data={item} index={index} {...props} />,
             id: index,
           }))}
         />
         <Flex style={styles.reply} alignCenter>
-          <TextInput style={styles.replyInput} placeholder="请输入回复内容" />
+          <TextInput
+            onChangeText={this.handleChangeComments}
+            style={styles.replyInput}
+            value={content}
+            placeholder="请输入回复内容"
+          />
           <Button
             style={styles.replyBtn}
-            onPress={this.handlePress}
+            onPress={this.handleSubmit}
             type="primary">
             回复
           </Button>
-          <Button style={styles.replyBtn}>收藏</Button>
         </Flex>
       </>
     );
@@ -68,13 +152,10 @@ export default class Home extends Component {
 }
 
 class Content extends Component {
-  handlePress = () => {
-    console.log('test');
-  };
   render() {
     const { box, topBox, comment } = styles;
     const { data } = this.props;
-    const { author, content, date } = data;
+    const { author, content, createdAt } = data;
 
     return (
       <Flex style={box}>
@@ -82,7 +163,7 @@ class Content extends Component {
           <Flex>
             <Text style={topBox}>{author}</Text>
             <Text style={{ paddingLeft: 10, color: '#857857' }}>
-              {days(date).format('YYYY-MM-DD HH-mm-ss')}
+              {days(_.toNumber(createdAt)).format('YYYY-MM-DD HH-mm-ss')}
             </Text>
           </Flex>
           <Text>{content}</Text>

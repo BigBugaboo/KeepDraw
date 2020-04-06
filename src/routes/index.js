@@ -1,6 +1,7 @@
 import { Actions } from 'react-native-router-flux';
 
 import Home from '../pages/home/index';
+import HomeDetail from '../pages/home/detail';
 import Mine from '../pages/mine/index';
 import MineInfo from '../pages/mine/info';
 import Login from '../pages/login/index';
@@ -28,8 +29,17 @@ export default [
   {
     type: 'scene',
     option: {
+      title: '作品详情',
+      drawer: true,
+      key: 'homeDetail',
+      component: HomeDetail,
+    },
+  },
+  {
+    type: 'scene',
+    option: {
       title: '分类',
-      key: 'sort', // 必须存在默认的 tabbar 的 key
+      key: 'sort',
       component: Sort,
     },
   },

@@ -29,7 +29,6 @@ export default class CopyDraws extends Component {
       more: true,
       loading: true,
       list: [],
-      error_index: [],
     };
   }
 
@@ -40,13 +39,19 @@ export default class CopyDraws extends Component {
   handleGetList = () => {
     this.setState({ loading: true });
     getLoginInfo().then(res => {
+      const person = `getPersonCopyDraws(
+        offset: ${this.state.offset}, 
+        phone: "${res.phone}", 
+        token: "${res.token}"
+        )`;
+      const normal = `getCopyDraws(
+        offset: ${this.state.offset}, 
+        authorId: "${this.props.id}"
+        )`;
+      const req = this.props.id ? normal : person;
       Request(
         'query',
-        `getCopyDraws(
-          offset: ${this.state.offset},
-          phone: "${res.phone}", 
-          token: "${res.token}", 
-        ) {
+        `${req} {
           list {
             _id
             src
@@ -60,8 +65,8 @@ export default class CopyDraws extends Component {
         }`,
       )
         .then(json => {
-          const { more, list } = json.data.getCopyDraws;
-          console.log(list);
+          const text = this.props.id ? 'getCopyDraws' : 'getPersonCopyDraws';
+          const { more, list } = json.data[text];
           _.forEach(list, (item, index) => {
             this.handleDown(index, item.src);
           });
@@ -87,9 +92,11 @@ export default class CopyDraws extends Component {
         this.setState({ list });
       })
       .catch(e => {
-        this.setState({
-          error_index: _.concat(this.state.error_index, index),
-        });
+        ToastAndroid.showWithGravity(
+          '加载失败，请重新刷新',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
       });
   };
 
@@ -241,7 +248,8 @@ export default class CopyDraws extends Component {
   };
 
   render() {
-    const { loading, list, more, error_index } = this.state;
+    const { loading, list, more } = this.state;
+    const { id } = this.props;
     const { content, box, img, infomation, date, banner, info, tip } = styles;
 
     return (
@@ -263,23 +271,7 @@ export default class CopyDraws extends Component {
           data={_.map(list, (item, index) => ({
             Content: () => (
               <View style={box}>
-                {_.includes(error_index, index) ? (
-                  <Button
-                    onPress={() => {
-                      this.setState(
-                        pre => ({
-                          offset: 0,
-                        }),
-                        () => {
-                          this.handleGetDraws();
-                        },
-                      );
-                    }}>
-                    重新获取图片
-                  </Button>
-                ) : (
-                  <Image style={img} source={{ uri: item.src }} />
-                )}
+                <Image style={img} source={{ uri: item.src }} />
                 <View style={infomation}>
                   <View style={info}>
                     <View>
@@ -290,43 +282,71 @@ export default class CopyDraws extends Component {
                       </Text>
                     </View>
                     <Text numberOfLines={1}>作者：{item.author}</Text>
-                    <Flex alignCenter>
-                      <Text>发布：{item.publish ? '已发布' : '未发布'}</Text>
-                      <Switch
-                        trackColor="#ffffff"
-                        thumbColor="#3399ff"
-                        testID={'publish'}
-                        onValueChange={() =>
-                          this.handleChangePublish(
-                            index,
-                            !item.publish,
-                            item._id,
-                          )
-                        }
-                        value={!!item.publish}
-                      />
-                    </Flex>
-                    <Text style={tip}>发布后，其他用户可查看临摹画作</Text>
+                    {id ? null : (
+                      <Flex alignCenter>
+                        <Text>发布：{item.publish ? '已发布' : '未发布'}</Text>
+                        <Switch
+                          trackColor="#ffffff"
+                          thumbColor="#3399ff"
+                          testID={'publish'}
+                          onValueChange={() =>
+                            this.handleChangePublish(
+                              index,
+                              !item.publish,
+                              item._id,
+                            )
+                          }
+                          value={!!item.publish}
+                        />
+                      </Flex>
+                    )}
+                    <Text style={tip}>
+                      {id
+                        ? '收藏后，在 我的信息-收藏集 中查看该临摹'
+                        : '发布后，其他用户可查看临摹画作'}
+                    </Text>
                   </View>
-                  <View style={banner}>
-                    <Button
-                      type="danger"
-                      onPress={() => this.handleDelete(item._id)}>
-                      删除
-                    </Button>
-                    <Button type="primary" onPress={this.handleDetail}>
-                      评分
-                    </Button>
-                  </View>
+                  {id ? (
+                    <View style={banner}>
+                      <Button
+                        type="default"
+                        onPress={() => this.handleDelete(item._id)}>
+                        查看
+                      </Button>
+                      <Button
+                        type="primary"
+                        onPress={() => this.handleDelete(item._id)}>
+                        上传
+                      </Button>
+                      <Button
+                        type="default"
+                        onPress={() => this.handleDelete(item._id)}>
+                        收藏
+                      </Button>
+                    </View>
+                  ) : (
+                    <View style={banner}>
+                      <Button
+                        type="danger"
+                        onPress={() => this.handleDelete(item._id)}>
+                        删除
+                      </Button>
+                      <Button type="primary" onPress={this.handleDetail}>
+                        评分
+                      </Button>
+                    </View>
+                  )}
                 </View>
               </View>
             ),
             id: item._id,
           }))}
         />
-        <Button type="primary" onPress={this.handleUpdateLoad}>
-          上传
-        </Button>
+        {id ? null : (
+          <Button type="primary" onPress={this.handleUpdateLoad}>
+            上传
+          </Button>
+        )}
       </>
     );
   }

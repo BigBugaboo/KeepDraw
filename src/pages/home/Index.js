@@ -33,7 +33,6 @@ export default class Home extends Component {
       loading: false,
       offset: 0,
       more: true,
-      error_index: [],
     };
   }
 
@@ -44,7 +43,6 @@ export default class Home extends Component {
   handleGetList = () => {
     this.setState({ loading: true });
     const sort = this.props.sort || '';
-    console.log(sort);
     getLoginInfo().then(res => {
       Request(
         'query',
@@ -57,6 +55,7 @@ export default class Home extends Component {
             title
             src
             author
+            authorId
             desc
             sort
             comments
@@ -68,6 +67,7 @@ export default class Home extends Component {
       )
         .then(json => {
           const { more, list } = json.data.getDraws;
+          console.log(list);
           _.forEach(list, (item, index) => {
             this.handleDown(index, item.src);
           });
@@ -93,22 +93,23 @@ export default class Home extends Component {
         this.setState({ list });
       })
       .catch(e => {
-        this.setState({
-          error_index: _.concat(this.state.error_index, index),
-        });
+        ToastAndroid.showWithGravity(
+          '加载失败，请重新刷新',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
       });
   };
 
   handelChangeState = data => {
-    console.log(data);
     this.setState({
       name: data.title,
       desc: data.desc,
-      id: data.id,
+      id: data._id,
     });
   };
 
-  handleDetail = () => {
+  handleComments = () => {
     if (this.state.id !== null) {
       Actions.push('comment', {
         id: this.state.id,
@@ -122,8 +123,25 @@ export default class Home extends Component {
     }
   };
 
+  handleDetail = () => {
+    const data = _.find(this.state.list, i => i._id === this.state.id);
+    console.log(data);
+    if (this.state.id !== null) {
+      Actions.push('homeDetail', {
+        id: this.state.id,
+        ...data,
+      });
+    } else {
+      ToastAndroid.showWithGravity(
+        '请点击图片获取信息',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+    }
+  };
+
   render() {
-    const { name, desc, id, list, loading, more, error_index } = this.state;
+    const { name, desc, id, list, loading, more } = this.state;
     return (
       <>
         <Loading show={loading} />
@@ -143,7 +161,7 @@ export default class Home extends Component {
           data={_.map(list, (item, index) => ({
             Content: props => (
               <Content
-                data={{ ...item, index, error_index }}
+                data={{ ...item }}
                 onClick={() => this.handelChangeState(item)}
                 index={index}
                 {...props}
@@ -153,22 +171,27 @@ export default class Home extends Component {
           }))}
         />
         <Flex style={styles.fixedBanner} alignCenter>
-          <TouchableOpacity style={styles.fixedBtn} onPress={this.handleDetail}>
-            <Text style={{ color: '#fff' }}>鉴赏</Text>
+          <TouchableOpacity
+            style={styles.fixedBtn}
+            onPress={this.handleComments}>
+            <Text style={{ color: '#fff' }}>点评</Text>
           </TouchableOpacity>
           {id !== null ? (
             <Flex column>
-              <TouchableOpacity style={styles.name}>
-                <Flex>
-                  <Text>作品名:</Text>
-                  <Text>{name}</Text>
-                </Flex>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.name}>
-                <Flex>
-                  <Text>描述:</Text>
-                  <Text numberOfLines={1}>{desc}</Text>
-                </Flex>
+              <TouchableOpacity onPress={this.handleDetail}>
+                <View style={styles.name}>
+                  <Flex>
+                    <Text>作品名:</Text>
+                    <Text>{name}</Text>
+                  </Flex>
+                </View>
+                <View style={styles.name}>
+                  <Flex>
+                    <Text>描述:</Text>
+                    <Text numberOfLines={1}>{desc}</Text>
+                  </Flex>
+                </View>
+                <Text>点击可查看作品详情</Text>
               </TouchableOpacity>
             </Flex>
           ) : (
@@ -188,28 +211,12 @@ class Content extends Component {
     const { box, imgBox } = styles;
     const { width, height } = Dimensions.get('window');
     const { data } = this.props;
-    const { src, index, error_index } = data;
+    const { src } = data;
 
     return (
       <TouchableHighlight onPress={this.handlePress}>
         <View style={[box, { height: height - 80 }]}>
-          {_.includes(error_index, index) ? (
-            <Button
-              onPress={() => {
-                this.setState(
-                  pre => ({
-                    offset: 0,
-                  }),
-                  () => {
-                    this.handleGetDraws();
-                  },
-                );
-              }}>
-              重新获取图片
-            </Button>
-          ) : (
-            <Image resizeMode="contain" style={imgBox} source={{ uri: src }} />
-          )}
+          <Image resizeMode="contain" style={imgBox} source={{ uri: src }} />
         </View>
       </TouchableHighlight>
     );

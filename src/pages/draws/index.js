@@ -28,7 +28,6 @@ export default class Draws extends Component {
       loading: true,
       more: false,
       offset: 0,
-      error_index: [],
     };
   }
 
@@ -185,9 +184,11 @@ export default class Draws extends Component {
         this.setState({ list });
       })
       .catch(e => {
-        this.setState({
-          error_index: _.concat(this.state.error_index, index),
-        });
+        ToastAndroid.showWithGravity(
+          '加载失败，请重新刷新',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
       });
   };
 
@@ -209,7 +210,7 @@ export default class Draws extends Component {
       banner,
       info,
     } = styles;
-    const { loading, list, more, error_index } = this.state;
+    const { loading, list, more } = this.state;
 
     return (
       <>
@@ -230,23 +231,7 @@ export default class Draws extends Component {
           data={_.map(list, (item, index) => ({
             Content: () => (
               <View style={box}>
-                {_.includes(error_index, index) ? (
-                  <Button
-                    onPress={() => {
-                      this.setState(
-                        pre => ({
-                          offset: 0,
-                        }),
-                        () => {
-                          this.handleGetDraws();
-                        },
-                      );
-                    }}>
-                    重新获取图片
-                  </Button>
-                ) : (
-                  <Image style={img} source={{ uri: item.src }} />
-                )}
+                <Image style={img} source={{ uri: item.src }} />
                 <View style={infomation}>
                   <View style={info}>
                     <View>
