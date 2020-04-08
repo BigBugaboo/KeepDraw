@@ -25,7 +25,7 @@ export default class Draws extends Component {
     this.state = {
       uri: '',
       list: [],
-      loading: true,
+      loading: false,
       more: false,
       offset: 0,
     };
@@ -142,6 +142,7 @@ export default class Draws extends Component {
   };
 
   handleUpdateImage = src => {
+    this.setState({ loading: true })
     getLoginInfo().then(res => {
       Request(
         'mutation',
@@ -167,6 +168,7 @@ export default class Draws extends Component {
         this.setState(
           pre => ({
             offset: 0,
+            loading: false,
           }),
           () => {
             this.handleGetDraws();

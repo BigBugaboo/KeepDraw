@@ -3,7 +3,10 @@ import { Text, View, StyleSheet, Image, ToastAndroid } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import _ from 'lodash';
 
+import { selectImage, downloadImage } from '../../utils';
+import { Request, getLoginInfo } from '../../api/index';
 import Loading from '../../components/common/Loading';
+import Flex from '../../components/common/Flex';
 import Button from '../..//components/common/Button';
 import List from '../../components/common/List';
 
@@ -24,6 +27,11 @@ const menuList = [
     path: 'collect',
   },
   {
+    key: 'collect',
+    title: '临摹集',
+    path: 'collect',
+  },
+  {
     key: 'logout',
     title: '注销',
     path: '',
@@ -37,8 +45,58 @@ export default class Mine extends React.Component {
 
     this.state = {
       loading: false,
+      showAvatar: '',
     };
   }
+
+  componentDidMount() {
+    getLoginInfo().then(res => {
+      this.handleGetInfo(res.phone, res.token);
+    });
+  }
+
+  handleGetInfo = (phone, token) => {
+    this.setState({
+      loading: true,
+    });
+    Request(
+      'query',
+      `
+      getAccount(phone: "${phone}", token: "${token}") {
+        mes
+        code
+        name
+        avatar
+      }
+    `,
+    ).then(res => {
+      const { name, avatar, code, mes } = res.data.getAccount;
+      avatar &&
+        downloadImage(avatar)
+          .then(img => {
+            this.setState({
+              showAvatar: img,
+            });
+          })
+          .finally(() => {
+            this.setState({
+              loading: false,
+            });
+          });
+      if (code === 1) {
+        ToastAndroid.showWithGravity(
+          mes,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        Actions.reset('login');
+      }
+      this.setState({
+        name,
+        showAvatar: avatar,
+      });
+    });
+  };
 
   onPress = e => {
     const actions = {
@@ -59,8 +117,10 @@ export default class Mine extends React.Component {
       info: () => {
         Actions.push('mineInfo');
       },
+      collect: () => {
+        Actions.push('collect');
+      }
     };
-    console.log(e);
     if (typeof actions[e.key] !== 'function') {
       return null;
     } else {
@@ -77,18 +137,26 @@ export default class Mine extends React.Component {
       menuItem,
       menuItemText,
     } = styles;
-    const { loading } = this.state;
+    const { loading, showAvatar } = this.state;
 
     return (
       <View style={container}>
         <Loading show={loading} />
-        <Image
-          style={avatar}
-          source={{
-            uri:
-              'http://b-ssl.duitang.com/uploads/item/201704/10/20170410095843_SEvMy.thumb.700_0.jpeg',
-          }}
-        />
+        {showAvatar ? (
+          <Image
+            style={avatar}
+            source={{
+              uri: showAvatar,
+            }}
+          />
+        ) : (
+          <Flex
+            style={[styles.avatar, { backgroundColor: '#ddd' }]}
+            alignCenter
+            justifyCenter>
+            <Text>未设置头像</Text>
+          </Flex>
+        )}
         <Text style={avatarName}>NMSL</Text>
         <List
           style={menu}

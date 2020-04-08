@@ -7,6 +7,7 @@ import {
   ScrollView,
   Image,
   Modal,
+  ToastAndroid,
   Dimensions,
 } from 'react-native';
 import { Actions } from 'react-native-router-flux';
@@ -49,6 +50,38 @@ export default class Detail extends Component {
   handleComments = () => {
     Actions.push('comment', {
       id: this.props.id,
+    });
+  };
+
+  handleAddCollect = () => {
+    this.setState({ loading: true });
+    getLoginInfo().then(res => {
+      // 只有画册有详情 draws
+      Request(
+        'mutation',
+        `
+          addCollect(
+            phone: "${res.phone}",
+            token: "${res.token}",
+            id: "${this.props.id}",
+            sort: "draws"
+          ) {
+            mes
+            code
+          }
+        `,
+      ).then(json => {
+        this.setState({ loading: false });
+        const { code, mes } = json.data.addCollect;
+        ToastAndroid.showWithGravity(
+          mes,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        if (code === 1) {
+          Actions.reset('login');
+        }
+      });
     });
   };
 
@@ -112,6 +145,7 @@ export default class Detail extends Component {
             <Text style={{ color: '#fff' }}>点评</Text>
           </TouchableOpacity>
           <TouchableOpacity
+            onPress={this.handleAddCollect}
             style={[styles.bannerBtn, { backgroundColor: '#f33' }]}>
             <Text style={{ color: '#fff' }}>收藏</Text>
           </TouchableOpacity>

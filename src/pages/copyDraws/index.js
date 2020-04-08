@@ -28,7 +28,7 @@ export default class CopyDraws extends Component {
     this.state = {
       offset: 0,
       more: true,
-      loading: true,
+      loading: false,
       list: [],
       modal_visible: false,
     };
@@ -249,6 +249,38 @@ export default class CopyDraws extends Component {
     );
   };
 
+  handleAddCollect = id => {
+    this.setState({ loading: true });
+    getLoginInfo().then(res => {
+      // 只有画册有详情 draws
+      Request(
+        'mutation',
+        `
+          addCollect(
+            phone: "${res.phone}",
+            token: "${res.token}",
+            id: "${id}",
+            sort: "copyDraws"
+          ) {
+            mes
+            code
+          }
+        `,
+      ).then(json => {
+        const { code, mes } = json.data.addCollect;
+        this.setState({ loading: false });
+        ToastAndroid.showWithGravity(
+          mes,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        if (code === 1) {
+          Actions.reset('login');
+        }
+      });
+    });
+  };
+
   handleShowImage = () => {};
 
   render() {
@@ -336,7 +368,7 @@ export default class CopyDraws extends Component {
                         </Button>
                         <Button
                           type="default"
-                          onPress={() => this.handleDelete(item._id)}>
+                          onPress={() => this.handleAddCollect(item._id)}>
                           收藏
                         </Button>
                       </>
