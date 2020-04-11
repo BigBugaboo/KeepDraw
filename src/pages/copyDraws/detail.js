@@ -2,53 +2,79 @@ import React, { Component } from 'react';
 import {
   Text,
   StyleSheet,
-  TouchableOpacity,
-  TextInput,
   Image,
   Dimensions,
+  ToastAndroid,
   View,
 } from 'react-native';
 import { Actions } from 'react-native-router-flux';
-
-import Flex from '../../components/common/Flex';
-import Button from '../../components/common/Button';
-import List from '../../components/common/List';
 import _ from 'lodash';
 import days from 'dayjs';
 
-const arr = [
-  {
-    id: 0,
-    author: '作者',
-    date: new Date(),
-    content:
-      '12312312111111111111111111111111111111111111111111111111111111111111111111111111111111111112',
-  },
-  {
-    id: 1,
-    author: '作者',
-    date: new Date(),
-    content:
-      '12312312111111111111111111111111111111111111111111111111111111111111111111111111111111111112',
-  },
-];
+import Flex from '../../components/common/Flex';
+import Button from '../../components/common/Button';
+import Loading from '../../components/common/Loading';
+import { Request } from '../../api/index';
+import { downloadImage } from '../../utils';
 
 export default class CopyDrawsDetail extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      loading: false,
+      id: '',
+      src: '',
+      createdAt: 0,
+    };
   }
 
+  componentDidMount() {
+    this.handleGetCopy();
+  }
+
+  handleGetCopy = () => {
+    this.setState({ loading: true });
+    Request(
+      'query',
+      `
+      getCopyDrawsCopys(id: "${this.props.id}") {
+        _id
+        src
+        createdAt
+      }
+      `,
+    ).then(json => {
+      const { _id, src, createdAt } = json.data.getCopyDrawsCopys;
+
+      downloadImage(src)
+        .then(res => {
+          this.setState({
+            loading: false,
+            id: _id,
+            createdAt: _.toNumber(createdAt),
+            src: res,
+          });
+        })
+        .catch(e => {
+          ToastAndroid.showWithGravity(
+            '加载失败，请重新刷新',
+            ToastAndroid.SHORT,
+            ToastAndroid.CENTER,
+          );
+        });
+    });
+  };
+
   render() {
+    const { loading, src, createdAt } = this.state;
     return (
       <View style={styles.container}>
+        <Loading show={loading} />
         <View style={styles.box}>
           <Image
             resizeMode="contain"
             style={styles.img}
-            source={{
-              uri:
-                'http://b-ssl.duitang.com/uploads/item/201704/10/20170410095843_SEvMy.thumb.700_0.jpeg',
-            }}
+            source={{ uri: src }}
           />
         </View>
         <Flex style={styles.banner}>
@@ -68,13 +94,17 @@ export default class CopyDrawsDetail extends Component {
             100%
           </Button>
         </Flex>
-        <Text style={styles.bannerTip}>评分（越高越好）</Text>
+        <Flex style={styles.bannerTip} justifyBetween>
+          <Text>评分（越高越好）</Text>
+          {createdAt ? (
+            <Text>{days(createdAt).format('YYYY-MM-DD HH:mm:ss')}</Text>
+          ) : null}
+        </Flex>
       </View>
     );
   }
 }
 
-const { width, height } = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
@@ -99,6 +129,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 40,
     color: '#393939',
-    right: 0,
+    left: 0,
+    width: '100%',
   },
 });

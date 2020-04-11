@@ -145,9 +145,9 @@ export default class CopyDraws extends Component {
     });
   };
 
-  handleDetail = () => {
+  handleDetail = id => {
     Actions.push('copyDrawsDetail', {
-      id: this.state.id,
+      id: id,
     });
   };
 
@@ -361,11 +361,11 @@ export default class CopyDraws extends Component {
                     </Button>
                     {id ? (
                       <>
-                        <Button
+                        {/* <Button
                           type="primary"
                           onPress={() => this.handleDelete(item._id)}>
                           上传
-                        </Button>
+                        </Button> */}
                         <Button
                           type="default"
                           onPress={() => this.handleAddCollect(item._id)}>
@@ -379,7 +379,9 @@ export default class CopyDraws extends Component {
                           onPress={() => this.handleDelete(item._id)}>
                           删除
                         </Button>
-                        <Button type="primary" onPress={this.handleDetail}>
+                        <Button
+                          type="primary"
+                          onPress={() => this.handleDetail(item._id)}>
                           评分
                         </Button>
                       </>

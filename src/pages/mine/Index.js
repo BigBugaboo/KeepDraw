@@ -14,7 +14,7 @@ const menuList = [
   {
     key: 'info',
     title: '修改个人信息',
-    path: '',
+    path: 'info',
   },
   {
     key: 'draws',
@@ -27,9 +27,9 @@ const menuList = [
     path: 'collect',
   },
   {
-    key: 'collect',
+    key: 'copys',
     title: '临摹集',
-    path: 'collect',
+    path: 'copys',
   },
   {
     key: 'logout',
@@ -99,32 +99,18 @@ export default class Mine extends React.Component {
   };
 
   onPress = e => {
-    const actions = {
-      logout: () => {
-        global.storage.remove({
-          key: 'userLoginInfo',
-        });
-        ToastAndroid.showWithGravity(
-          '已注销',
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
-        Actions.replace('login');
-      },
-      draws: () => {
-        Actions.push('draws');
-      },
-      info: () => {
-        Actions.push('mineInfo');
-      },
-      collect: () => {
-        Actions.push('collect');
-      }
-    };
-    if (typeof actions[e.key] !== 'function') {
-      return null;
+    if (e.key === 'logout') {
+      global.storage.remove({
+        key: 'userLoginInfo',
+      });
+      ToastAndroid.showWithGravity(
+        '已注销',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+      Actions.replace('login');
     } else {
-      actions[e.key]();
+      Actions.push(e.key);
     }
   };
 

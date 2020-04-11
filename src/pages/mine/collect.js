@@ -158,8 +158,46 @@ export default class Collect extends Component {
     );
   };
 
-  handleUpdate = id => {
-    console.log();
+  handleUpdateload = id => {
+    selectImage(res => {
+      if (res) {
+        this.handleUpdateImage(id, res.uri);
+      }
+    }, 0);
+  };
+
+  handleUpdateImage = (id, src) => {
+    this.setState({ loading: true });
+    getLoginInfo().then(res => {
+      Request(
+        'mutation',
+        `
+        addCopys(
+          phone: "${res.phone}",
+          token: "${res.token}",
+          src: "${src}",,
+          draws_id: "${id}",
+        ) {
+          mes
+          code
+        }
+      `,
+      ).then(json => {
+        const { code, mes } = json.data.addCopys;
+        ToastAndroid.showWithGravity(
+          mes,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        if (code === 1) {
+          Actions.reset('login');
+        }
+
+        this.setState({
+          loading: false,
+        });
+      });
+    });
   };
 
   render() {
@@ -251,7 +289,7 @@ export default class Collect extends Component {
                         ) : (
                           <Button
                             type="primary"
-                            onPress={() => this.handleUpdate(item._id)}>
+                            onPress={() => this.handleUpdateload(item._id)}>
                             上传临摹
                           </Button>
                         )}
