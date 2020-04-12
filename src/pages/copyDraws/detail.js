@@ -85,6 +85,7 @@ export default class CopyDrawsDetail extends Component {
         ToastAndroid.SHORT,
         ToastAndroid.CENTER,
       );
+      this.handleGetCopy();
     });
   };
 
