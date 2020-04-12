@@ -14,6 +14,7 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import _ from 'lodash';
 import days from 'dayjs';
 import { Actions } from 'react-native-router-flux';
+import Big from 'big.js';
 
 import Flex from '../../components/common/Flex';
 import Button from '../../components/common/Button';
@@ -137,7 +138,10 @@ export default class Copys extends Component {
                       )}
                     </Text>
                     {item.count ? (
-                      <Text numberOfLines={3}>原图作者评分：{item.count}</Text>
+                      <>
+                        <Text numberOfLines={3}>原图作者评分</Text>
+                        <Text>{+Big(item.count).times(100)}% 相似度</Text>
+                      </>
                     ) : (
                       <Text>作者暂未评分</Text>
                     )}

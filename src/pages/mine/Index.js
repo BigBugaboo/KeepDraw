@@ -12,9 +12,9 @@ import List from '../../components/common/List';
 
 const menuList = [
   {
-    key: 'info',
+    key: 'mineInfo',
     title: '修改个人信息',
-    path: 'info',
+    path: 'mineInfo',
   },
   {
     key: 'draws',
@@ -123,7 +123,7 @@ export default class Mine extends React.Component {
       menuItem,
       menuItemText,
     } = styles;
-    const { loading, showAvatar } = this.state;
+    const { loading, showAvatar, name } = this.state;
 
     return (
       <View style={container}>
@@ -143,7 +143,7 @@ export default class Mine extends React.Component {
             <Text>未设置头像</Text>
           </Flex>
         )}
-        <Text style={avatarName}>NMSL</Text>
+        <Text style={avatarName}>{name}</Text>
         <List
           style={menu}
           data={_.map(menuList, item => ({

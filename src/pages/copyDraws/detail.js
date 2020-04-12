@@ -44,24 +44,47 @@ export default class CopyDrawsDetail extends Component {
       }
       `,
     ).then(json => {
-      const { _id, src, createdAt } = json.data.getCopyDrawsCopys;
-
-      downloadImage(src)
-        .then(res => {
-          this.setState({
-            loading: false,
-            id: _id,
-            createdAt: _.toNumber(createdAt),
-            src: res,
+      if (json.data.getCopyDrawsCopys) {
+        const { _id, src, createdAt } = json.data.getCopyDrawsCopys;
+        downloadImage(src)
+          .then(res => {
+            this.setState({
+              loading: false,
+              id: _id,
+              createdAt: _.toNumber(createdAt),
+              src: res,
+            });
+          })
+          .catch(e => {
+            ToastAndroid.showWithGravity(
+              '加载失败，请重新刷新',
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER,
+            );
           });
-        })
-        .catch(e => {
-          ToastAndroid.showWithGravity(
-            '加载失败，请重新刷新',
-            ToastAndroid.SHORT,
-            ToastAndroid.CENTER,
-          );
+      } else {
+        console.log('哈');
+        this.setState({
+          loading: false,
+          src: '',
         });
+      }
+    });
+  };
+
+  handleSubmit = count => {
+    Request(
+      'mutation',
+      `
+      updateCopys(id: "${this.state.id}", count: ${count}) { mes }
+      `,
+    ).then(json => {
+      const { mes } = json.data.updateCopys;
+      ToastAndroid.showWithGravity(
+        mes,
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
     });
   };
 
@@ -70,27 +93,46 @@ export default class CopyDrawsDetail extends Component {
     return (
       <View style={styles.container}>
         <Loading show={loading} />
-        <View style={styles.box}>
-          <Image
-            resizeMode="contain"
-            style={styles.img}
-            source={{ uri: src }}
-          />
-        </View>
+        <Flex style={styles.box} justifyCenter alignCenter>
+          {src ? (
+            <Image
+              resizeMode="contain"
+              style={styles.img}
+              source={{ uri: src }}
+            />
+          ) : (
+            <Text>暂无临摹</Text>
+          )}
+        </Flex>
         <Flex style={styles.banner}>
-          <Button style={styles.bannerItem} type="white">
+          <Button
+            style={styles.bannerItem}
+            onPress={() => this.handleSubmit(0)}
+            type="white">
             0%
           </Button>
-          <Button style={styles.bannerItem} type="warn">
+          <Button
+            style={styles.bannerItem}
+            onPress={() => this.handleSubmit(0.25)}
+            type="warn">
             25%
           </Button>
-          <Button style={styles.bannerItem} type="success">
+          <Button
+            style={styles.bannerItem}
+            onPress={() => this.handleSubmit(0.5)}
+            type="success">
             50%
           </Button>
-          <Button style={styles.bannerItem} type="primary">
+          <Button
+            style={styles.bannerItem}
+            onPress={() => this.handleSubmit(0.75)}
+            type="primary">
             75%
           </Button>
-          <Button style={styles.bannerItem} type="danger">
+          <Button
+            style={styles.bannerItem}
+            onPress={() => this.handleSubmit(1.0)}
+            type="danger">
             100%
           </Button>
         </Flex>
