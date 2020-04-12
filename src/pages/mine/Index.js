@@ -17,9 +17,9 @@ const menuList = [
     path: 'mineInfo',
   },
   {
-    key: 'draws',
+    key: 'changePassword',
     title: '修改密码',
-    path: 'draws',
+    path: 'changePassword',
   },
   {
     key: 'collect',

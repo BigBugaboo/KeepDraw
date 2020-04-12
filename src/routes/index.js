@@ -4,6 +4,7 @@ import Home from '../pages/home/index';
 import HomeDetail from '../pages/home/detail';
 import Mine from '../pages/mine/index';
 import MineInfo from '../pages/mine/info';
+import ChangePassword from '../pages/mine/changePassword';
 import Collect from '../pages/mine/collect';
 import Copys from '../pages/mine/copys';
 import Login from '../pages/login/index';
@@ -79,6 +80,16 @@ export default [
       title: '修改个人信息',
       key: 'mineInfo',
       component: MineInfo,
+      rightTitle: ' ',
+    },
+  },
+  {
+    type: 'scene',
+    option: {
+      navBarButtonColor: '#39f',
+      title: '修改密码',
+      key: 'changePassword',
+      component: ChangePassword,
       rightTitle: ' ',
     },
   },

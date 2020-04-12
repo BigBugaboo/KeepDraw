@@ -68,6 +68,9 @@ const mineStyles = StyleSheet.create({
   alignCenter: {
     alignItems: 'center',
   },
+  alignStart: {
+    alignItems: 'flex-start',
+  },
 });
 
 Flex.propsTypes = {
@@ -83,4 +86,5 @@ Flex.propsTypes = {
   justifyStart: PropTypes.bool,
   justifyEnd: PropTypes.bool,
   alignCenter: PropTypes.bool,
+  alignStart: PropTypes.bool,
 };
