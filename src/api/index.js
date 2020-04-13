@@ -1,7 +1,7 @@
 import { ToastAndroid } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 
-export const getLoginInfo = async () => {
+export const getLoginInfo = async show => {
   return global.storage
     .load({
       key: 'userLoginInfo',
@@ -10,12 +10,14 @@ export const getLoginInfo = async () => {
       if (res.token && res.phone) {
         return res;
       } else {
-        ToastAndroid.showWithGravity(
-          '账号信息错误，请重新登录',
-          ToastAndroid.SHORT,
-          ToastAndroid.TOP,
-        );
-        Actions.reset('login');
+        if (show) {
+          ToastAndroid.showWithGravity(
+            '账号信息错误，请重新登录',
+            ToastAndroid.SHORT,
+            ToastAndroid.TOP,
+          );
+          Actions.reset('login');
+        }
       }
     })
     .catch(e => {
@@ -29,12 +31,14 @@ export const getLoginInfo = async () => {
           break;
       }
       console.log('warnning', e);
-      ToastAndroid.showWithGravity(
-        '账号信息错误，请重新登录',
-        ToastAndroid.SHORT,
-        ToastAndroid.TOP,
-      );
-      Actions.reset('login');
+      if (show) {
+        ToastAndroid.showWithGravity(
+          '账号信息错误，请重新登录',
+          ToastAndroid.SHORT,
+          ToastAndroid.TOP,
+        );
+        Actions.reset('login');
+      }
     });
 };
 

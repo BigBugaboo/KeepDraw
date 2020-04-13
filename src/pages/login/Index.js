@@ -28,8 +28,7 @@ export default class Login extends Component {
       isLoad: false,
     };
   }
-
-  componentDidMount() {
+  componentWillMount() {
     getLoginInfo().then(res => {
       if (res) {
         // 如果找到数据，则跳转首页
