@@ -142,11 +142,29 @@ export default class Home extends Component {
 
   handleReLoad = () => {
     this.setState(
-      pre => ({ offset: 0 }),
+      pre => ({
+        offset: 0,
+        name: '',
+        desc: '',
+        id: null,
+        src: '',
+      }),
       () => {
         this.handleGetList();
       },
     );
+  };
+
+  handleShowImage = () => {
+    if (this.state.id !== null) {
+      this.setState({ modal_visible: true });
+    } else {
+      ToastAndroid.showWithGravity(
+        '请点击图片获取信息',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+    }
   };
 
   render() {
@@ -195,44 +213,48 @@ export default class Home extends Component {
             id: index,
           }))}
         />
-        <Flex style={styles.fixedBanner} alignCenter>
-          <TouchableOpacity
-            style={styles.fixedBtn}
-            onPress={this.handleComments}>
-            <Text style={{ color: '#fff' }}>点评</Text>
-          </TouchableOpacity>
+        <Flex style={styles.fixedInfo} alignCenter>
           {id !== null ? (
-            <>
-              <TouchableOpacity style={{ flex: 1 }} onPress={this.handleDetail}>
-                <Flex column>
-                  <View style={styles.name}>
-                    <Flex>
-                      <Text style={{ color: '#fff' }}>作品名:</Text>
-                      <Text style={{ color: '#fff' }}>{name}</Text>
-                    </Flex>
-                  </View>
-                  <View style={styles.name}>
-                    <Flex>
-                      <Text style={{ color: '#fff' }}>描述:</Text>
-                      <Text style={{ color: '#fff' }} numberOfLines={1}>
-                        {desc}
-                      </Text>
-                    </Flex>
-                  </View>
-                  <Text style={{ color: '#fff', textAlign: 'right' }}>
-                    点击这里，查看作品详情
+            <Flex style={{ width: '100%' }} column>
+              <View style={styles.name}>
+                <Flex>
+                  <Text style={{ color: '#fff' }}>作品名:</Text>
+                  <Text style={{ color: '#fff' }}>{name}</Text>
+                </Flex>
+              </View>
+              <View style={styles.name}>
+                <Flex>
+                  <Text style={{ color: '#fff' }}>描述:</Text>
+                  <Text style={{ color: '#fff' }} numberOfLines={1}>
+                    {desc}
+                    111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
                   </Text>
                 </Flex>
-              </TouchableOpacity>
-            </>
+              </View>
+              <Text style={{ color: '#fff', textAlign: 'right' }}>
+                图片显示错误，请点击刷新
+              </Text>
+            </Flex>
           ) : (
-            <Text style={{ color: '#fff' }}>请点击图片获取信息</Text>
+            <Text style={{ width: '100%', color: '#fff', textAlign: 'center' }}>
+              请点击图片获取信息
+            </Text>
           )}
         </Flex>
         <Flex column alignCenter justifyAround style={styles.banner}>
           <TouchableOpacity
-            onPress={() => this.setState({ modal_visible: true })}
-            style={[styles.bannerBtn, { backgroundColor: '#39f' }]}>
+            onPress={this.handleComments}
+            style={[styles.bannerBtn, { backgroundColor: '#f46' }]}>
+            <Text style={{ color: '#fff' }}>点评</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={this.handleDetail}
+            style={[styles.bannerBtn, { backgroundColor: '#090979' }]}>
+            <Text style={{ color: '#fff' }}>查看详情</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={this.handleShowImage}
+            style={[styles.bannerBtn, { backgroundColor: '#00d4ff' }]}>
             <Text style={{ color: '#fff' }}>查看大图</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -290,39 +312,31 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  fixedBanner: {
+  fixedInfo: {
     position: 'absolute',
-    bottom: 10,
-    left: 20,
-    width: width - 100,
+    bottom: 0,
+    left: 0,
+    padding: 10,
+    width: '100%',
     backgroundColor: '#000',
-    borderTopLeftRadius: 100,
-    borderBottomLeftRadius: 100,
     opacity: 0.8,
   },
-  fixedBtn: {
-    backgroundColor: '#f46',
-    height: 60,
-    width: 60,
-    borderRadius: 100,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   name: {
-    padding: 4,
+    width: '70%',
+    padding: 2,
     opacity: 0.8,
   },
   banner: {
     position: 'absolute',
-    bottom: 10,
-    right: 10,
+    bottom: 40,
+    right: 5,
   },
   bannerBtn: {
     marginTop: 10,
     display: 'flex',
-    width: 60,
-    height: 60,
+    width: 50,
+    height: 50,
+    padding: 10,
     backgroundColor: '#39f',
     alignItems: 'center',
     justifyContent: 'center',
