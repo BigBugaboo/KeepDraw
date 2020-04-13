@@ -167,11 +167,10 @@ export default class ChangePassword extends React.Component {
             )}
           </Flex>
         </Flex>
-        <TouchableOpacity
-          style={styles.bannerSubmit}
-          onPress={this.handleSubmit}>
-          <Text style={styles.btnText}>修改</Text>
-        </TouchableOpacity>
+
+        <Button shape="round" type="white" onPress={this.handleSubmit}>
+          确认修改
+        </Button>
       </View>
     );
   }
@@ -191,21 +190,5 @@ const styles = StyleSheet.create({
     height: 40,
     textAlign: 'center',
     width: '50%',
-  },
-  bannerSubmit: {
-    backgroundColor: '#f33',
-    padding: 5,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 100,
-  },
-  btnText: {
-    borderWidth: 2,
-    borderStyle: 'solid',
-    borderRadius: 100,
-    borderColor: '#fff',
-    color: '#fff',
-    padding: 30,
   },
 });

@@ -41,6 +41,7 @@ export default class Copys extends Component {
   }
 
   handleGetList = () => {
+    this.setState({ loading: true });
     getLoginInfo().then(res => {
       const { offset } = this.state;
       Request(
@@ -70,17 +71,19 @@ export default class Copys extends Component {
           list: arr,
           offset: more ? this.state.offset + 1 : this.state.offset,
           more: !!more,
+          loading: false,
         });
       });
     });
   };
 
   handleDown = (index, src) => {
+    this.setState({ loading: true });
     downloadImage(src)
       .then(res => {
         const list = _.cloneDeep(this.state.list);
         list[index].src = res;
-        this.setState({ list });
+        this.setState({ list, loading: false });
       })
       .catch(e => {
         ToastAndroid.showWithGravity(
@@ -97,7 +100,6 @@ export default class Copys extends Component {
 
     return (
       <>
-        <Loading show={loading} />
         <List
           style={content}
           ListFooterComponent={
@@ -152,6 +154,7 @@ export default class Copys extends Component {
             id: item._id,
           }))}
         />
+        <Loading show={loading} />
       </>
     );
   }

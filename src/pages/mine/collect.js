@@ -40,6 +40,7 @@ export default class Collect extends Component {
   }
 
   handleGetList = () => {
+    this.setState({ loading: true });
     getLoginInfo().then(res => {
       const { offset, sort } = this.state;
       Request(
@@ -77,17 +78,19 @@ export default class Collect extends Component {
           list: arr,
           offset: more ? this.state.offset + 1 : this.state.offset,
           more: !!more,
+          loading: false,
         });
       });
     });
   };
 
   handleDown = (index, src) => {
+    this.setState({ loading: true });
     downloadImage(src)
       .then(res => {
         const list = _.cloneDeep(this.state.list);
         list[index].src = res;
-        this.setState({ list });
+        this.setState({ list, loading: false });
       })
       .catch(e => {
         ToastAndroid.showWithGravity(
@@ -206,7 +209,6 @@ export default class Collect extends Component {
 
     return (
       <>
-        <Loading show={loading} />
         <List
           style={content}
           ListFooterComponent={
@@ -316,6 +318,7 @@ export default class Collect extends Component {
             {sort === 'copyDraws' ? '选择：' : ''}临摹
           </Button>
         </Flex>
+        <Loading show={loading} />
       </>
     );
   }

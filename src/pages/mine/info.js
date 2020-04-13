@@ -119,6 +119,7 @@ export default class MineInfo extends React.Component {
         if (code === 1) {
           Actions.reset('login');
         }
+        Actions.pop();
       });
     });
   };
