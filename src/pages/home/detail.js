@@ -15,17 +15,17 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import days from 'dayjs';
 
 import Flex from '../../components/common/Flex';
-import List from '../../components/common/List';
+import Loading from '../../components/common/Loading';
 import _ from 'lodash';
-import { selectImage, downloadImage } from '../../utils';
+import { downloadImage } from '../../utils';
 import { Request, getLoginInfo } from '../../api/index';
-const imgSrc =
-  'http://b-ssl.duitang.com/uploads/item/201704/10/20170410095843_SEvMy.thumb.700_0.jpeg';
+
 export default class Detail extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showAvatar: true,
+      loading: false,
+      showAvatar: '',
       sort: '',
       modal_visible: false,
     };
@@ -33,6 +33,7 @@ export default class Detail extends Component {
 
   componentDidMount() {
     this.handleGetSort();
+    this.handleGetInfo();
   }
 
   handleGetSort = () => {
@@ -51,6 +52,48 @@ export default class Detail extends Component {
     Actions.push('comment', {
       id: this.props.id,
     });
+  };
+
+  handleGetInfo = () => {
+    getLoginInfo().then(res => {
+      this.setState({
+        loading: true,
+      });
+      Request(
+        'query',
+        `
+        getAccount(phone: "${res.phone}", token: "${res.token}") {
+          mes
+          code
+          name
+          avatar
+        }
+      `,
+      ).then(res => {
+        const { avatar, code, mes } = res.data.getAccount;
+        avatar &&
+          downloadImage(avatar)
+            .then(img => {
+              console.log(img);
+              this.setState({
+                showAvatar: img,
+              });
+            })
+            .finally(() => {
+              this.setState({
+                loading: false,
+              });
+            });
+        if (code === 1) {
+          ToastAndroid.showWithGravity(
+            mes,
+            ToastAndroid.SHORT,
+            ToastAndroid.CENTER,
+          );
+          Actions.reset('login');
+        }
+      });
+    })
   };
 
   handleAddCollect = () => {
@@ -93,9 +136,11 @@ export default class Detail extends Component {
 
   render() {
     const { author, title, comments, createdAt, desc, src } = this.props;
-    const { showAvatar, sort, modal_visible } = this.state;
+    const { showAvatar, sort, modal_visible, loading } = this.state;
+
     return (
       <View style={styles.container}>
+        <Loading show={loading} />
         <Modal
           visible={modal_visible}
           transparent={true}
@@ -130,7 +175,7 @@ export default class Detail extends Component {
         </ScrollView>
         <Flex column alignCenter justifyAround style={styles.banner}>
           {showAvatar ? (
-            <Image style={styles.avatar} source={{ uri: imgSrc }} />
+            <Image style={styles.avatar} source={{ uri: showAvatar }} />
           ) : (
             <Flex
               style={[styles.avatar, { backgroundColor: '#ddd' }]}
