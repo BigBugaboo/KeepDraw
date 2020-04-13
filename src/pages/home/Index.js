@@ -5,21 +5,20 @@ import {
   StyleSheet,
   TouchableHighlight,
   TouchableOpacity,
-  FlatList,
-  PanResponder,
+  Modal,
   Image,
   ToastAndroid,
-  TouchableWithoutFeedback,
   Dimensions,
 } from 'react-native';
 import { Actions } from 'react-native-router-flux';
+import ImageViewer from 'react-native-image-zoom-viewer';
 
 import Flex from '../../components/common/Flex';
 import Button from '../../components/common/Button';
 import Loading from '../../components/common/Loading';
 import List from '../../components/common/List';
 import _ from 'lodash';
-import { selectImage, downloadImage } from '../../utils';
+import { downloadImage } from '../../utils';
 import { Request, getLoginInfo } from '../../api/index';
 
 export default class Home extends Component {
@@ -28,11 +27,13 @@ export default class Home extends Component {
     this.state = {
       name: '',
       desc: '',
+      src: '',
       id: null,
       list: [],
       loading: false,
       offset: 0,
       more: true,
+      modal_visible: false,
     };
   }
 
@@ -105,6 +106,7 @@ export default class Home extends Component {
       name: data.title,
       desc: data.desc,
       id: data._id,
+      src: data.src,
     });
   };
 
@@ -138,11 +140,36 @@ export default class Home extends Component {
     }
   };
 
+  handleReLoad = () => {
+    this.setState(
+      pre => ({ offset: 0 }),
+      () => {
+        this.handleGetList();
+      },
+    );
+  };
+
   render() {
-    const { name, desc, id, list, loading, more } = this.state;
+    const {
+      name,
+      desc,
+      id,
+      list,
+      loading,
+      more,
+      modal_visible,
+      src,
+    } = this.state;
     return (
       <>
-        <Loading show={loading} />
+        <Modal
+          visible={modal_visible}
+          transparent={true}
+          onRequestClose={() => {
+            this.setState({ modal_visible: false });
+          }}>
+          <ImageViewer imageUrls={[{ url: src }]} />
+        </Modal>
         <List
           ListFooterComponent={
             <Flex justifyCenter>
@@ -175,27 +202,46 @@ export default class Home extends Component {
             <Text style={{ color: '#fff' }}>点评</Text>
           </TouchableOpacity>
           {id !== null ? (
-            <Flex column>
-              <TouchableOpacity onPress={this.handleDetail}>
-                <View style={styles.name}>
-                  <Flex>
-                    <Text>作品名:</Text>
-                    <Text>{name}</Text>
-                  </Flex>
-                </View>
-                <View style={styles.name}>
-                  <Flex>
-                    <Text>描述:</Text>
-                    <Text numberOfLines={1}>{desc}</Text>
-                  </Flex>
-                </View>
-                <Text>点击可查看作品详情</Text>
+            <>
+              <TouchableOpacity style={{ flex: 1 }} onPress={this.handleDetail}>
+                <Flex column>
+                  <View style={styles.name}>
+                    <Flex>
+                      <Text style={{ color: '#fff' }}>作品名:</Text>
+                      <Text style={{ color: '#fff' }}>{name}</Text>
+                    </Flex>
+                  </View>
+                  <View style={styles.name}>
+                    <Flex>
+                      <Text style={{ color: '#fff' }}>描述:</Text>
+                      <Text style={{ color: '#fff' }} numberOfLines={1}>
+                        {desc}
+                      </Text>
+                    </Flex>
+                  </View>
+                  <Text style={{ color: '#fff', textAlign: 'right' }}>
+                    点击这里，查看作品详情
+                  </Text>
+                </Flex>
               </TouchableOpacity>
-            </Flex>
+            </>
           ) : (
-            <Text>请点击图片获取信息</Text>
+            <Text style={{ color: '#fff' }}>请点击图片获取信息</Text>
           )}
         </Flex>
+        <Flex column alignCenter justifyAround style={styles.banner}>
+          <TouchableOpacity
+            onPress={() => this.setState({ modal_visible: true })}
+            style={[styles.bannerBtn, { backgroundColor: '#39f' }]}>
+            <Text style={{ color: '#fff' }}>查看大图</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={this.handleReLoad}
+            style={[styles.bannerBtn, { backgroundColor: '#fff' }]}>
+            <Text style={{ color: '#000' }}>刷新</Text>
+          </TouchableOpacity>
+        </Flex>
+        <Loading show={loading} />
       </>
     );
   }
@@ -235,8 +281,8 @@ const styles = StyleSheet.create({
   },
   box: {
     width: '100%',
-    backgroundColor: '#fff',
-    borderBottomColor: '#dfdfdf',
+    backgroundColor: '#d9d9d9',
+    borderBottomColor: '#888',
     borderBottomWidth: 1,
     borderStyle: 'solid',
   },
@@ -248,8 +294,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 10,
     left: 20,
-    width: width - 40,
-    backgroundColor: '#aaa',
+    width: width - 100,
+    backgroundColor: '#000',
     borderTopLeftRadius: 100,
     borderBottomLeftRadius: 100,
     opacity: 0.8,
@@ -266,5 +312,20 @@ const styles = StyleSheet.create({
   name: {
     padding: 4,
     opacity: 0.8,
+  },
+  banner: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+  },
+  bannerBtn: {
+    marginTop: 10,
+    display: 'flex',
+    width: 60,
+    height: 60,
+    backgroundColor: '#39f',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 100,
   },
 });
