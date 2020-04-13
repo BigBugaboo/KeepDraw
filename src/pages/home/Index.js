@@ -227,7 +227,6 @@ export default class Home extends Component {
                   <Text style={{ color: '#fff' }}>描述:</Text>
                   <Text style={{ color: '#fff' }} numberOfLines={1}>
                     {desc}
-                    111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
                   </Text>
                 </Flex>
               </View>
