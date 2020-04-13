@@ -163,7 +163,7 @@ class Content extends Component {
           <Flex>
             <Text style={topBox}>{author}</Text>
             <Text style={{ paddingLeft: 10, color: '#857857' }}>
-              {days(_.toNumber(createdAt)).format('YYYY-MM-DD HH-mm-ss')}
+              {days(_.toNumber(createdAt)).format('YYYY-MM-DD HH:mm:ss')}
             </Text>
           </Flex>
           <Text>{content}</Text>
