@@ -113,12 +113,30 @@ export const uploadImage = (objectKey, filePath) =>
 
 export const downloadImage = objectKey =>
   new Promise((resolve, reject) => {
-    AliyunOSS.asyncDownload('keepdraw', objectKey)
-      .then(e => {
-        resolve(`file://${e}`);
+    // 加入持久化存储，因为阿里云没有自定义域名，无法获取预览图片能力。
+    global.storage
+      .load({
+        key: objectKey,
       })
-      .catch(e => {
-        reject(false);
+      .then(res => {
+        resolve(res.src);
+      })
+      .catch(() => {
+        AliyunOSS.asyncDownload('keepdraw', objectKey)
+          .then(e => {
+            console.log(e);
+            const res = `file://${e}`;
+            global.storage.save({
+              key: objectKey,
+              data: {
+                src: res,
+              },
+            });
+            resolve(res);
+          })
+          .catch(e => {
+            reject(false);
+          });
       });
   });
 
