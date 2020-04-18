@@ -4,8 +4,6 @@ import {
   View,
   ToastAndroid,
   StyleSheet,
-  Switch,
-  Alert,
   Image,
   Dimensions,
   Modal,
@@ -166,7 +164,7 @@ export default class Collect extends Component {
       if (res) {
         this.handleUpdateImage(id, res.uri);
       }
-    }, 0);
+    }, 2);
   };
 
   handleUpdateImage = (id, src) => {

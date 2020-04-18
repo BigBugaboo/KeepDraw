@@ -4,8 +4,6 @@ import {
   View,
   ToastAndroid,
   StyleSheet,
-  Switch,
-  Alert,
   Image,
   Dimensions,
   Modal,
@@ -13,14 +11,13 @@ import {
 import ImageViewer from 'react-native-image-zoom-viewer';
 import _ from 'lodash';
 import days from 'dayjs';
-import { Actions } from 'react-native-router-flux';
 import Big from 'big.js';
 
 import Flex from '../../components/common/Flex';
 import Button from '../../components/common/Button';
 import Loading from '../../components/common/Loading';
 import List from '../../components/common/List';
-import { selectImage, downloadImage } from '../../utils';
+import { downloadImage } from '../../utils';
 import { Request, getLoginInfo } from '../../api/index';
 
 export default class Copys extends Component {

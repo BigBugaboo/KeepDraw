@@ -107,7 +107,7 @@ export default class CopyDraws extends Component {
       if (res) {
         this.handleUpdateImage(res.uri);
       }
-    }, 0);
+    }, 2);
   };
 
   handleUpdateImage = src => {

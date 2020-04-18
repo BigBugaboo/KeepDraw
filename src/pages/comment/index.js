@@ -2,11 +2,9 @@ import React, { Component } from 'react';
 import {
   Text,
   StyleSheet,
-  TouchableOpacity,
   TextInput,
   Dimensions,
   ToastAndroid,
-  View,
 } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import _ from 'lodash';
@@ -15,7 +13,6 @@ import days from 'dayjs';
 import Flex from '../../components/common/Flex';
 import Button from '../../components/common/Button';
 import List from '../../components/common/List';
-import { selectImage, downloadImage } from '../../utils';
 import { Request, getLoginInfo } from '../../api/index';
 
 export default class Comments extends Component {

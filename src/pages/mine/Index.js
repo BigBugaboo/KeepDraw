@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Text, View, StyleSheet, Image, ToastAndroid } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import _ from 'lodash';
 
-import { selectImage, downloadImage } from '../../utils';
+import { downloadImage } from '../../utils';
 import { Request, getLoginInfo } from '../../api/index';
 import Loading from '../../components/common/Loading';
 import Flex from '../../components/common/Flex';

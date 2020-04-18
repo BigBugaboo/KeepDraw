@@ -2,7 +2,21 @@ import AliyunOSS from 'aliyun-oss-react-native';
 import ImagePicker from 'react-native-image-picker';
 import uuid from 'rn-uuid';
 import _ from 'lodash';
-import { Request, getLoginInfo } from './api/index';
+import { getLoginInfo } from './api/index';
+
+// 初始化oss信息
+const configuration = {
+  maxRetryCount: 3,
+  timeoutIntervalForRequest: 30,
+  timeoutIntervalForResource: 24 * 60 * 60,
+};
+
+AliyunOSS.initWithPlainTextAccessKey(
+  'LTAI4Fe3L5JruU7SC1Wesgbh',
+  'HMfxOCJqvA0nqbndEYJi0cHFJhMgOs',
+  'oss-cn-shenzhen.aliyuncs.com',
+  configuration,
+);
 
 /**
  * throttle 限流
@@ -83,19 +97,6 @@ export const debounce = (func, wait = 1000, immediate = true) => {
 
 export const uploadImage = (objectKey, filePath) =>
   new Promise((resolve, reject) => {
-    const configuration = {
-      maxRetryCount: 3,
-      timeoutIntervalForRequest: 30,
-      timeoutIntervalForResource: 24 * 60 * 60,
-    };
-
-    AliyunOSS.initWithPlainTextAccessKey(
-      'LTAI4Fe3L5JruU7SC1Wesgbh',
-      'HMfxOCJqvA0nqbndEYJi0cHFJhMgOs',
-      'oss-cn-shenzhen.aliyuncs.com',
-      configuration,
-    );
-
     AliyunOSS.asyncUpload('keepdraw', objectKey, filePath)
       .then(e => {
         resolve(objectKey);
@@ -112,19 +113,6 @@ export const uploadImage = (objectKey, filePath) =>
 
 export const downloadImage = objectKey =>
   new Promise((resolve, reject) => {
-    const configuration = {
-      maxRetryCount: 3,
-      timeoutIntervalForRequest: 30,
-      timeoutIntervalForResource: 24 * 60 * 60,
-    };
-
-    AliyunOSS.initWithPlainTextAccessKey(
-      'LTAI4Fe3L5JruU7SC1Wesgbh',
-      'HMfxOCJqvA0nqbndEYJi0cHFJhMgOs',
-      'oss-cn-shenzhen.aliyuncs.com',
-      configuration,
-    );
-
     AliyunOSS.asyncDownload('keepdraw', objectKey)
       .then(e => {
         resolve(`file://${e}`);
@@ -157,11 +145,9 @@ const selectImageConfig = {
 /**
  * selectImage 选择图片
  * @param {number} storageType 存储分类 0: 头像, 1: 画册, 2: 临摹
- * @param {number} imgType 图片分类
  */
-export const selectImage = async (callBack, storageType, imgType = -1) => {
+export const selectImage = async (callBack, storageType) => {
   const storageTypes = ['avatar', 'draws', 'copyDraws'];
-  const imgTypes = [];
   ImagePicker.showImagePicker(selectImageConfig, async response => {
     if (response.didCancel) {
       console.log('用户取消选择图片');

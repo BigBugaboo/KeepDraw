@@ -97,7 +97,7 @@ export default class Draws extends Component {
       if (res) {
         this.handleUpdateImage(res.uri);
       }
-    }, 0);
+    }, 1);
   };
 
   handleRemove = id => {

@@ -274,7 +274,7 @@ class Content extends Component {
   };
   render() {
     const { box, imgBox } = styles;
-    const { width, height } = Dimensions.get('window');
+    const { height } = Dimensions.get('window');
     const { data } = this.props;
     const { src } = data;
 
