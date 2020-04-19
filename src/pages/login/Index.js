@@ -38,12 +38,7 @@ export default class Login extends Component {
             mes code
           }`,
         ).then(json => {
-          const { code, mes } = json.data.checktAccount;
-          ToastAndroid.showWithGravity(
-            mes,
-            ToastAndroid.SHORT,
-            ToastAndroid.CENTER,
-          );
+          const { code } = json.data.checktAccount;
           if (code !== 1) {
             Actions.reset('tabBar');
           }

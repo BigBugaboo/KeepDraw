@@ -16,7 +16,6 @@ export const getLoginInfo = async show => {
             ToastAndroid.SHORT,
             ToastAndroid.TOP,
           );
-          Actions.reset('login');
         }
       }
     })
@@ -37,7 +36,6 @@ export const getLoginInfo = async show => {
           ToastAndroid.SHORT,
           ToastAndroid.TOP,
         );
-        Actions.reset('login');
       }
     });
 };

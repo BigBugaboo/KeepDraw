@@ -38,7 +38,24 @@ export default class Home extends Component {
   }
 
   componentDidMount() {
-    this.handleGetList();
+    getLoginInfo().then(res => {
+      if (res) {
+        // 如果找到数据，校验
+        Request(
+          'query',
+          `checktAccount(phone: "${res.phone}", token: "${res.token}") {
+            mes code
+          }`,
+        ).then(json => {
+          const { code } = json.data.checktAccount;
+          if (code !== 1) {
+            this.handleGetList();
+          } else {
+            Actions.reset('tabBar');
+          }
+        });
+      }
+    });
   }
 
   handleGetList = () => {
