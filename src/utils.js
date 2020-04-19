@@ -2,21 +2,8 @@ import AliyunOSS from 'aliyun-oss-react-native';
 import ImagePicker from 'react-native-image-picker';
 import uuid from 'rn-uuid';
 import _ from 'lodash';
+
 import { getLoginInfo } from './api/index';
-
-// 初始化oss信息
-const configuration = {
-  maxRetryCount: 3,
-  timeoutIntervalForRequest: 30,
-  timeoutIntervalForResource: 24 * 60 * 60,
-};
-
-AliyunOSS.initWithPlainTextAccessKey(
-  'LTAI4Fe3L5JruU7SC1Wesgbh',
-  'HMfxOCJqvA0nqbndEYJi0cHFJhMgOs',
-  'oss-cn-shenzhen.aliyuncs.com',
-  configuration,
-);
 
 /**
  * throttle 限流
@@ -97,6 +84,20 @@ export const debounce = (func, wait = 1000, immediate = true) => {
 
 export const uploadImage = (objectKey, filePath) =>
   new Promise((resolve, reject) => {
+    // 初始化oss信息
+    const configuration = {
+      maxRetryCount: 3,
+      timeoutIntervalForRequest: 30,
+      timeoutIntervalForResource: 24 * 60 * 60,
+    };
+
+    AliyunOSS.initWithPlainTextAccessKey(
+      'LTAI4Fe3L5JruU7SC1Wesgbh',
+      'HMfxOCJqvA0nqbndEYJi0cHFJhMgOs',
+      'oss-cn-shenzhen.aliyuncs.com',
+      configuration,
+    );
+
     AliyunOSS.asyncUpload('keepdraw', objectKey, filePath)
       .then(e => {
         resolve(objectKey);
@@ -122,9 +123,22 @@ export const downloadImage = objectKey =>
         resolve(res.src);
       })
       .catch(() => {
+        // 初始化oss信息
+        const configuration = {
+          maxRetryCount: 3,
+          timeoutIntervalForRequest: 30,
+          timeoutIntervalForResource: 24 * 60 * 60,
+        };
+
+        AliyunOSS.initWithPlainTextAccessKey(
+          'LTAI4Fe3L5JruU7SC1Wesgbh',
+          'HMfxOCJqvA0nqbndEYJi0cHFJhMgOs',
+          'oss-cn-shenzhen.aliyuncs.com',
+          configuration,
+        );
+
         AliyunOSS.asyncDownload('keepdraw', objectKey)
           .then(e => {
-            console.log(e);
             const res = `file://${e}`;
             global.storage.save({
               key: objectKey,
