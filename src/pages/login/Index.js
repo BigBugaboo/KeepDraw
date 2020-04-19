@@ -31,8 +31,23 @@ export default class Login extends Component {
   componentWillMount() {
     getLoginInfo().then(res => {
       if (res) {
-        // 如果找到数据，则跳转首页
-        Actions.reset('tabBar');
+        // 如果找到数据，校验
+        Request(
+          'query',
+          `checktAccount(phone: "${res.phone}", token: "${res.token}") {
+            mes code
+          }`,
+        ).then(json => {
+          const { code, mes } = json.data.checktAccount;
+          ToastAndroid.showWithGravity(
+            mes,
+            ToastAndroid.SHORT,
+            ToastAndroid.CENTER,
+          );
+          if (code !== 1) {
+            Actions.reset('tabBar');
+          }
+        });
       }
     });
   }
