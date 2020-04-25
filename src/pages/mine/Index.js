@@ -69,33 +69,42 @@ export default class Mine extends React.Component {
         avatar
       }
     `,
-    ).then(res => {
-      const { name, avatar, code, mes } = res.data.getAccount;
-      avatar &&
-        downloadImage(avatar)
-          .then(img => {
-            this.setState({
-              showAvatar: img,
-            });
-          })
-          .finally(() => {
-            this.setState({
-              loading: false,
-            });
-          });
-      if (code === 1) {
-        ToastAndroid.showWithGravity(
-          mes,
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
-        Actions.reset('login');
-      }
-      this.setState({
-        name,
-        showAvatar: avatar,
+    )
+      .then(res => {
+        const { name, avatar, code, mes } = res.data.getAccount;
+        avatar &&
+          (() => {
+            this.setState({ loading: true })
+            downloadImage(avatar)
+              .then(img => {
+                this.setState({
+                  showAvatar: img,
+                });
+              })
+              .finally(() => {
+                this.setState({
+                  loading: false,
+                });
+              });
+          })();
+        if (code === 1) {
+          ToastAndroid.showWithGravity(
+            mes,
+            ToastAndroid.SHORT,
+            ToastAndroid.CENTER,
+          );
+          Actions.reset('login');
+        }
+        this.setState({
+          name,
+          showAvatar: avatar,
+        });
+      })
+      .finally(() => {
+        this.setState({
+          loading: false,
+        });
       });
-    });
   };
 
   onPress = e => {

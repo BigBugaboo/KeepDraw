@@ -55,13 +55,14 @@ export default class Detail extends Component {
   };
 
   handleGetInfo = () => {
-    getLoginInfo().then(res => {
-      this.setState({
-        loading: true,
-      });
-      Request(
-        'query',
-        `
+    getLoginInfo()
+      .then(res => {
+        this.setState({
+          loading: true,
+        });
+        Request(
+          'query',
+          `
         getAccount(phone: "${res.phone}", token: "${res.token}") {
           mes
           code
@@ -69,31 +70,36 @@ export default class Detail extends Component {
           avatar
         }
       `,
-      ).then(res => {
-        const { avatar, code, mes } = res.data.getAccount;
-        avatar &&
-          downloadImage(avatar)
-            .then(img => {
-              console.log(img);
-              this.setState({
-                showAvatar: img,
-              });
-            })
-            .finally(() => {
-              this.setState({
-                loading: false,
-              });
-            });
-        if (code === 1) {
-          ToastAndroid.showWithGravity(
-            mes,
-            ToastAndroid.SHORT,
-            ToastAndroid.CENTER,
-          );
-          Actions.reset('login');
-        }
+        ).then(res => {
+          const { avatar, code, mes } = res.data.getAccount;
+          avatar &&
+            (() => {
+              this.setState({ loading: true });
+              downloadImage(avatar)
+                .then(img => {
+                  this.setState({
+                    showAvatar: img,
+                  });
+                })
+                .finally(() => {
+                  this.setState({ loading: false });
+                });
+            })();
+          if (code === 1) {
+            ToastAndroid.showWithGravity(
+              mes,
+              ToastAndroid.SHORT,
+              ToastAndroid.CENTER,
+            );
+            Actions.reset('login');
+          }
+        });
+      })
+      .finally(() => {
+        this.setState({
+          loading: false,
+        });
       });
-    })
   };
 
   handleAddCollect = () => {
