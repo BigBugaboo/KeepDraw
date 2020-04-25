@@ -48,33 +48,33 @@ export default class MineInfo extends React.Component {
         avatar
       }
     `,
-    ).then(res => {
-      const { name, avatar, code, mes } = res.data.getAccount;
-      avatar &&
-        downloadImage(avatar)
-          .then(img => {
+    )
+      .then(res => {
+        const { name, avatar, code, mes } = res.data.getAccount;
+        avatar &&
+          downloadImage(avatar).then(img => {
             this.setState({
               showAvatar: img,
             });
-          })
-          .finally(() => {
-            this.setState({
-              loading: false,
-            });
           });
-      if (code === 1) {
-        ToastAndroid.showWithGravity(
-          mes,
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
-        Actions.reset('login');
-      }
-      this.setState({
-        name,
-        showAvatar: avatar,
+        if (code === 1) {
+          ToastAndroid.showWithGravity(
+            mes,
+            ToastAndroid.SHORT,
+            ToastAndroid.CENTER,
+          );
+          Actions.reset('login');
+        }
+        this.setState({
+          name,
+          showAvatar: avatar,
+        });
+      })
+      .finally(() => {
+        this.setState({
+          loading: false,
+        });
       });
-    });
   };
 
   handleUpdateAvatar = async () => {
@@ -119,7 +119,7 @@ export default class MineInfo extends React.Component {
         if (code === 1) {
           Actions.reset('login');
         }
-        Actions.pop();
+        Actions.pop({ refresh: { is_update: true } });
       });
     });
   };
