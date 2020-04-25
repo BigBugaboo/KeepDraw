@@ -305,15 +305,15 @@ export default class Collect extends Component {
         <Flex>
           <Button
             style={{ width: '50%' }}
-            type="primary"
+            type={sort === 'draws' ? 'primary' : 'white'}
             onPress={() => this.handleChangeSort('draws')}>
-            {sort === 'draws' ? '选择：' : ''}画册
+            画册
           </Button>
           <Button
             style={{ width: '50%' }}
-            type="danger"
+            type={sort === 'copyDraws' ? 'primary' : 'white'}
             onPress={() => this.handleChangeSort('copyDraws')}>
-            {sort === 'copyDraws' ? '选择：' : ''}临摹
+            临摹
           </Button>
         </Flex>
         <Loading show={loading} />

@@ -1,5 +1,4 @@
 import { ToastAndroid } from 'react-native';
-import { Actions } from 'react-native-router-flux';
 
 export const getLoginInfo = async show => {
   return global.storage
@@ -16,6 +15,7 @@ export const getLoginInfo = async show => {
             ToastAndroid.SHORT,
             ToastAndroid.TOP,
           );
+          return null;
         }
       }
     })

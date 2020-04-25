@@ -66,7 +66,9 @@ export default class Home extends Component {
         'query',
         `getDraws(
           offset: ${this.state.offset},
-          sort: "${sort}"
+          sort: "${sort}",
+          phone: "${res.phone || null}",
+          token: "${res.token || null}"
         ) {
           list {
             _id
@@ -351,10 +353,10 @@ const styles = StyleSheet.create({
     right: 5,
   },
   bannerBtn: {
-    marginTop: 10,
+    marginTop: 5,
     display: 'flex',
-    width: 60,
-    height: 60,
+    width: 80,
+    height: 80,
     backgroundColor: '#39f',
     alignItems: 'center',
     justifyContent: 'center',

@@ -179,19 +179,21 @@ export default class Draws extends Component {
   };
 
   handleDown = (index, src) => {
-    downloadImage(src)
-      .then(res => {
-        const list = _.cloneDeep(this.state.list);
-        list[index].src = res;
-        this.setState({ list });
-      })
-      .catch(e => {
-        ToastAndroid.showWithGravity(
-          '加载失败，请重新刷新',
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
-      });
+    if (!/file:/.test(src)) {
+      downloadImage(src)
+        .then(res => {
+          const list = _.cloneDeep(this.state.list);
+          list[index].src = res;
+          this.setState({ list });
+        })
+        .catch(e => {
+          ToastAndroid.showWithGravity(
+            '加载失败，请重新刷新',
+            ToastAndroid.SHORT,
+            ToastAndroid.CENTER,
+          );
+        });
+    }
   };
 
   handleDetail = item => {

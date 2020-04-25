@@ -12,12 +12,12 @@ const menu = [
   {
     key: 'draws',
     title: '画册',
-    method: 'draws',
+    method: 'push',
   },
   {
     key: 'copyDraws',
-    title: '临摹',
-    method: 'copyDraws',
+    title: '临摹任务',
+    method: 'push',
   },
   {
     key: 'mine',
