@@ -75,11 +75,11 @@ export default class Draws extends Component {
       )
         .then(json => {
           const { more, list } = json.data.getPersonDraws;
-          _.forEach(list, (item, index) => {
+          const arr =
+            this.state.offset === 0 ? list : _.concat(this.state.list, list);
+          _.forEach(arr, (item, index) => {
             this.handleDown(index, item.src);
           });
-          const arr =
-            this.state.offset === 0 ? list : _.concat(list, this.state.list);
           this.setState({
             list: arr,
             offset: more ? this.state.offset + 1 : this.state.offset,
@@ -142,7 +142,7 @@ export default class Draws extends Component {
   };
 
   handleUpdateImage = src => {
-    this.setState({ loading: true })
+    this.setState({ loading: true });
     getLoginInfo().then(res => {
       Request(
         'mutation',
@@ -222,7 +222,7 @@ export default class Draws extends Component {
           ListFooterComponent={
             <Flex justifyCenter>
               {list.length > 0 && more ? (
-                <Button style={{ width: '20%' }} type="white">
+                <Button onPress={this.handleGetDraws} type="white">
                   加载更多
                 </Button>
               ) : (

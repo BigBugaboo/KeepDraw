@@ -60,10 +60,10 @@ export default class Copys extends Component {
         `,
       ).then(json => {
         const { more, list } = json.data.getPersonCopys;
-        _.forEach(list, (item, index) => {
+        const arr = offset === 0 ? list : _.concat(this.state.list, list);
+        _.forEach(arr, (item, index) => {
           this.handleDown(index, item.src);
         });
-        const arr = offset === 0 ? list : _.concat(list, this.state.list);
         this.setState({
           list: arr,
           offset: more ? this.state.offset + 1 : this.state.offset,
@@ -102,7 +102,7 @@ export default class Copys extends Component {
           ListFooterComponent={
             <Flex justifyCenter>
               {list.length > 0 && more ? (
-                <Button style={{ width: '20%' }} type="white">
+                <Button onPress={this.handleGetList} type="white">
                   加载更多
                 </Button>
               ) : (

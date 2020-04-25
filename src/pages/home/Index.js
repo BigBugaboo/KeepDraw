@@ -3,7 +3,7 @@ import {
   Text,
   View,
   StyleSheet,
-  TouchableHighlight,
+  TouchableWithoutFeedback,
   TouchableOpacity,
   Modal,
   Image,
@@ -85,11 +85,11 @@ export default class Home extends Component {
       )
         .then(json => {
           const { more, list } = json.data.getDraws;
+          const arr =
+            this.state.offset === 0 ? list : _.concat(this.state.list, list);
           _.forEach(list, (item, index) => {
             this.handleDown(index, item.src);
           });
-          const arr =
-            this.state.offset === 0 ? list : _.concat(list, this.state.list);
           this.setState({
             list: arr,
             offset: more ? this.state.offset + 1 : this.state.offset,
@@ -209,7 +209,7 @@ export default class Home extends Component {
           ListFooterComponent={
             <Flex justifyCenter>
               {list.length > 0 && more ? (
-                <Button style={{ width: '20%' }} type="white">
+                <Button onPress={this.handleGetList} type="white">
                   加载更多
                 </Button>
               ) : (
@@ -296,16 +296,15 @@ class Content extends Component {
     const { src } = data;
 
     return (
-      <TouchableHighlight onPress={this.handlePress}>
+      <TouchableWithoutFeedback onPress={this.handlePress}>
         <View style={[box, { height: height - 80 }]}>
           <Image resizeMode="contain" style={imgBox} source={{ uri: src }} />
         </View>
-      </TouchableHighlight>
+      </TouchableWithoutFeedback>
     );
   }
 }
 
-const { width, height } = Dimensions.get('window');
 const styles = StyleSheet.create({
   list: {
     width: '100%',
@@ -350,9 +349,8 @@ const styles = StyleSheet.create({
   bannerBtn: {
     marginTop: 10,
     display: 'flex',
-    width: 50,
-    height: 50,
-    padding: 10,
+    width: 60,
+    height: 60,
     backgroundColor: '#39f',
     alignItems: 'center',
     justifyContent: 'center',

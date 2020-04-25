@@ -47,8 +47,9 @@ export default class Comments extends Component {
       `,
     ).then(json => {
       const { more, list } = json.data.getComments;
+      const arr = offset === 0 ? list : _.concat(this.state.list, list);
       this.setState({
-        list: list,
+        list: arr,
         more: !!more,
       });
     });
@@ -119,9 +120,15 @@ export default class Comments extends Component {
       <>
         <List
           ListFooterComponent={
-            <Text style={{ textAlign: 'center', color: '#999' }}>
-              已经到底了~~
-            </Text>
+            <Flex justifyCenter>
+              {list.length > 0 && more ? (
+                <Button onPress={this.handleGetList} type="white">
+                  加载更多
+                </Button>
+              ) : (
+                <Text>已经到底了</Text>
+              )}
+            </Flex>
           }
           style={styles.list}
           data={_.map(list, (item, index) => ({
