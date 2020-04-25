@@ -7,13 +7,17 @@ import Flex from './Flex';
 // 加载组件,由于position只能设置absolute，所以覆盖为父组件的容器范围
 export default class Loading extends Component {
   render() {
-    const { size, color, show, text } = this.props;
+    const { size, color, show, text, bg } = this.props;
 
     return show ? (
       <View style={[styles.container]}>
-        <Flex style={styles.box} column justifyAround alignCenter>
+        <Flex
+          style={[styles.box, bg && styles.bg]}
+          column
+          justifyAround
+          alignCenter>
           <ActivityIndicator size={size} color={color} />
-          <Text style={{ color: '#39f'}}>{text}</Text>
+          <Text style={{ color: '#39f' }}>{text}</Text>
         </Flex>
       </View>
     ) : null;
@@ -24,6 +28,7 @@ Loading.propTypes = {
   size: PropTypes.oneOf('large', 'small'),
   color: PropTypes.string,
   show: PropTypes.bool,
+  bg: PropTypes.bool,
   text: PropTypes.string,
 };
 
@@ -51,5 +56,8 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     marginLeft: '30%',
+  },
+  bg: {
+    backgroundColor: 'transparent',
   },
 });

@@ -227,7 +227,7 @@ export default class Home extends Component {
                 {...props}
               />
             ),
-            id: index,
+            id: item.id,
           }))}
         />
         <Flex style={styles.fixedInfo} alignCenter>
@@ -294,13 +294,17 @@ class Content extends Component {
     const { height } = Dimensions.get('window');
     const { data } = this.props;
     const { src } = data;
+    const loading = /file:/.test(src);
 
     return (
-      <TouchableWithoutFeedback onPress={this.handlePress}>
-        <View style={[box, { height: height - 80 }]}>
-          <Image resizeMode="contain" style={imgBox} source={{ uri: src }} />
-        </View>
-      </TouchableWithoutFeedback>
+      <>
+        <Loading color="#39f" show={!loading} bg />
+        <TouchableWithoutFeedback onPress={this.handlePress}>
+          <View style={[box, { height: height - 80 }]}>
+            <Image resizeMode="contain" style={imgBox} source={{ uri: src }} />
+          </View>
+        </TouchableWithoutFeedback>
+      </>
     );
   }
 }
