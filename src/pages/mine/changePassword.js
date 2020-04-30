@@ -38,6 +38,17 @@ export default class ChangePassword extends React.Component {
       );
       return null;
     }
+    // 6-20 字母数字下划线组成
+    const patrn = /^(\w){6,20}$/;
+    if (!patrn.exec(newPassword)) {
+      ToastAndroid.showWithGravity(
+        '密码格式错误,请重新输入',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+      return null;
+    }
+
     this.setState({ loading: true });
     getLoginInfo().then(res => {
       Request(
@@ -146,7 +157,8 @@ export default class ChangePassword extends React.Component {
             <TextInput
               style={styles.input}
               value={newPassword}
-              maxLength={8}
+              maxLength={20}
+              placeholder="6-20位，由字母、数值或下划线组成"
               onChangeText={this.onChange.bind(this, 'newPassword')}
             />
           </Flex>

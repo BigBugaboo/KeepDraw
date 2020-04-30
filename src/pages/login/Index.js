@@ -52,7 +52,7 @@ export default class Login extends Component {
     // 校验
     if (phone.length !== 11) {
       ToastAndroid.showWithGravity(
-        '请填写有效的11手机号码!',
+        '请填写有效的11位手机号码!',
         ToastAndroid.SHORT,
         ToastAndroid.CENTER,
       );
@@ -66,7 +66,7 @@ export default class Login extends Component {
       return null;
     } else if (type === 1 && code.trim() === '') {
       ToastAndroid.showWithGravity(
-        '验证码为空，请输入密码',
+        '验证码为空，请输入验证码',
         ToastAndroid.SHORT,
         ToastAndroid.CENTER,
       );
