@@ -33,7 +33,6 @@ export default class Detail extends Component {
 
   componentDidMount() {
     this.handleGetSort();
-    this.handleGetInfo();
   }
 
   handleGetSort = () => {
@@ -52,54 +51,6 @@ export default class Detail extends Component {
     Actions.push('comment', {
       id: this.props.id,
     });
-  };
-
-  handleGetInfo = () => {
-    getLoginInfo()
-      .then(res => {
-        this.setState({
-          loading: true,
-        });
-        Request(
-          'query',
-          `
-        getAccount(phone: "${res.phone}", token: "${res.token}") {
-          mes
-          code
-          name
-          avatar
-        }
-      `,
-        ).then(res => {
-          const { avatar, code, mes } = res.data.getAccount;
-          avatar &&
-            (() => {
-              this.setState({ loading: true });
-              downloadImage(avatar)
-                .then(img => {
-                  this.setState({
-                    showAvatar: img,
-                  });
-                })
-                .finally(() => {
-                  this.setState({ loading: false });
-                });
-            })();
-          if (code === 1) {
-            ToastAndroid.showWithGravity(
-              mes,
-              ToastAndroid.SHORT,
-              ToastAndroid.CENTER,
-            );
-            Actions.reset('login');
-          }
-        });
-      })
-      .finally(() => {
-        this.setState({
-          loading: false,
-        });
-      });
   };
 
   handleAddCollect = () => {
@@ -142,7 +93,7 @@ export default class Detail extends Component {
 
   render() {
     const { author, title, comments, createdAt, desc, src } = this.props;
-    const { showAvatar, sort, modal_visible, loading } = this.state;
+    const { sort, modal_visible, loading } = this.state;
 
     return (
       <View style={styles.container}>
@@ -180,16 +131,6 @@ export default class Detail extends Component {
           </View>
         </ScrollView>
         <Flex column alignCenter justifyAround style={styles.banner}>
-          {showAvatar ? (
-            <Image style={styles.avatar} source={{ uri: showAvatar }} />
-          ) : (
-            <Flex
-              style={[styles.avatar, { backgroundColor: '#ddd' }]}
-              alignCenter
-              justifyCenter>
-              <Text>未设置头像</Text>
-            </Flex>
-          )}
           <TouchableOpacity
             onPress={this.handleComments}
             style={[styles.bannerBtn, { backgroundColor: '#f46' }]}>

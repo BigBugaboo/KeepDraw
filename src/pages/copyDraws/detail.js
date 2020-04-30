@@ -63,7 +63,6 @@ export default class CopyDrawsDetail extends Component {
             );
           });
       } else {
-        console.log('哈');
         this.setState({
           loading: false,
           src: '',

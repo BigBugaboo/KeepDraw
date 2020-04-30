@@ -188,11 +188,6 @@ export const selectImage = async (callBack, storageType) => {
     } else if (response.customButton) {
       console.log('User tapped custom button: ', response.customButton);
     } else {
-      // You can also display the image using data:
-      // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-      // this.setState({
-      //   avatarSource: source,
-      // });
       let image_type = '';
       const is_image = _.some(['jpeg', 'png', 'jpg'], i => {
         const res = response.type.indexOf(i) !== -1;

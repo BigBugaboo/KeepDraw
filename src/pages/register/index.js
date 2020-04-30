@@ -111,7 +111,6 @@ export default class Register extends Component {
                 ToastAndroid.CENTER,
               );
               if (phone === req.phone) {
-                // todo 跳转登录，携带手机号自动填写
                 Actions.reset('login', { phone });
               }
             })

@@ -183,21 +183,23 @@ export default class Collect extends Component {
           code
         }
       `,
-      ).then(json => {
-        const { code, mes } = json.data.addCopys;
-        ToastAndroid.showWithGravity(
-          mes,
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
-        );
-        if (code === 1) {
-          Actions.reset('login');
-        }
-
-        this.setState({
-          loading: false,
+      )
+        .then(json => {
+          const { code, mes } = json.data.addCopys;
+          ToastAndroid.showWithGravity(
+            mes,
+            ToastAndroid.SHORT,
+            ToastAndroid.CENTER,
+          );
+          if (code === 1) {
+            Actions.reset('login');
+          }
+        })
+        .finally(() => {
+          this.setState({
+            loading: false,
+          });
         });
-      });
     });
   };
 
