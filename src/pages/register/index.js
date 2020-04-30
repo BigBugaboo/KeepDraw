@@ -29,7 +29,7 @@ export default class Register extends Component {
           text: '密码',
           name: 'password',
           maxLength: 20,
-          placeholder: '6-20位，由字母、数值或下划线组成',
+          placeholder: '6-20位，由字母、数字或下划线组成',
           msg: '',
           value: '',
           inputOption: {

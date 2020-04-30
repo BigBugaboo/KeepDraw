@@ -158,10 +158,10 @@ export default class ChangePassword extends React.Component {
               style={styles.input}
               value={newPassword}
               maxLength={20}
-              placeholder="6-20位，由字母、数值或下划线组成"
               onChangeText={this.onChange.bind(this, 'newPassword')}
             />
           </Flex>
+          <Text>密码由6-20位，由字母、数字或下划线组成</Text>
           <Flex justifyStart alignCenter>
             <Text>验证码：</Text>
             <TextInput
