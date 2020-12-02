@@ -13,7 +13,7 @@
     "aliyun-oss-react-native": "^1.0.0-alpha.7",
     "big.js": "^5.2.2",
     "dayjs": "^1.8.23",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "react": "16.9.0",
     "react-native": "0.61.5",
     "react-native-image-picker": "^2.3.1",
